@@ -11,6 +11,9 @@ import org.apache.commons.codec.binary.Base64InputStream;
 import org.apache.commons.codec.binary.Base64OutputStream;
 import org.mozilla.intl.chardet.HtmlCharsetDetector;
 
+import com.j256.simplemagic.ContentInfo;
+import com.j256.simplemagic.ContentInfoUtil;
+
 import info.monitorenter.cpdetector.io.ASCIIDetector;
 import info.monitorenter.cpdetector.io.ByteOrderMarkDetector;
 import info.monitorenter.cpdetector.io.CodepageDetectorProxy;
@@ -183,7 +186,7 @@ public class FileHandler {
         String[] saUniqueKey = new String[iSplitCnt];
         ArrayList iSaltPositions = new ArrayList();
         int iTemp = 0;
-        System.out.println((int)(Math.random() * 1000));
+//        System.out.println((int)(Math.random() * 1000));
         for(int i=0;i<iSplitCnt;i++){
         	iTemp = (int)(Math.random() * 20);
         	if(iTemp==0) iTemp = 1;     
@@ -302,7 +305,7 @@ public class FileHandler {
         
         try{
         	oMetaInfo = (HashMap)this.readSerEncFile(sMetaFilePath);
-            System.out.println(oMetaInfo);
+        System.out.println(oMetaInfo);
             ArrayList <String>aSplitFileList = (ArrayList)oMetaInfo.get(CommonConst.SPLIT_FILE_NAMES);
             
             file = new File(sOutPutFilePath);
@@ -465,7 +468,7 @@ public class FileHandler {
     
     public void mergeFile4Binary(String sMetaFilePath, String sOutPutFilePath) throws JayException{
     	HashMap oMetaInfo = (HashMap)this.readSerEncFile(sMetaFilePath);
-//        System.out.println(oMetaInfo);
+    System.out.println(oMetaInfo);
         ArrayList aSplitFileList = (ArrayList)oMetaInfo.get(CommonConst.SPLIT_FILE_NAMES);
     	
         FileOutputStream Os = null;
@@ -762,9 +765,20 @@ public class FileHandler {
             //type isn't text
         	ret = true;
         }
-        System.out.println("Is this file Binary ? : "+ ret);
+//        System.out.println("Is this file Binary ? : "+ ret);
         return ret;
     }
+    
+    private boolean isBinary(byte[] bytes, int len){
+    	int count = 0; // for checking EOF
+    	for (byte thisByte : bytes) {
+    		if (thisByte == 0 && count < len-1){
+    			return true;
+    		}
+    		count++;
+    	}
+    	return false;
+	}
     
     /**
      * 
@@ -781,21 +795,23 @@ public class FileHandler {
         try {
             inputStream = new FileReader(filename);
  
-            int c;
+            File f = new File(filename);
+            byte [] buffer = new byte[(int)f.length()]; 
+        	int c;
             while ((c = inputStream.read()) != -1) {
  
                 Character.UnicodeBlock block = Character.UnicodeBlock.of(c);
-                 
+                
                 if (block == Character.UnicodeBlock.BASIC_LATIN || block == Character.UnicodeBlock.GREEK) {
-//                     (9)Horizontal Tab (10)Line feed  (11)Vertical tab (13)Carriage return (32)Space (126)tilde
+//                         (9)Horizontal Tab (10)Line feed  (11)Vertical tab (13)Carriage return (32)Space (126)tilde
                     if (c==9 || c == 10 || c == 11 || c == 13 || (c >= 32 && c <= 126)) {
                     	bResult = true;
  
-//                            (153)Superscript two (160)ϊ  (255) No break space                     
+//                                (153)Superscript two (160)ϊ  (255) No break space                     
                     } else if (c == 153 || c >= 160 && c <= 255) {
                     	bResult = true;
  
-//                            (884)ʹ (885)͵ (890)ͺ (894); (900)' (974)ώ     
+//                                (884)ʹ (885)͵ (890)ͺ (894); (900)' (974)ώ     
                     } else if (c == 884 || c == 885 || c == 890 || c == 894 || c >= 900 && c <= 1019) {
                     	bResult = true;
  
@@ -805,6 +821,7 @@ public class FileHandler {
                     }
                 }                
             }
+            
         } catch (Exception ex) {
         	throw new JayException(ex);
         } finally {

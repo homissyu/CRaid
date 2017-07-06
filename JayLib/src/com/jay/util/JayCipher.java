@@ -132,9 +132,9 @@ public class JayCipher {
     
     private static void chkKeyFile() throws Exception{
         File file = new File(System.getProperty(CommonConst.USER_DIR_PROP_KEY)+File.separator+CommonConst.LIB_DIR+File.separator+CommonConst.KEY_FILE);
-        System.out.println(file.getAbsolutePath());
+//        System.out.println(file.getAbsolutePath());
         if(!file.exists()){
-        	System.out.println(file.exists());
+//        	System.out.println(file.exists());
             Key aKey = generateRandomSecretKey(CommonConst.AES);
             FileHandler.writeSerFile( aKey, System.getProperty(CommonConst.USER_DIR_PROP_KEY)+File.separator+CommonConst.LIB_DIR, CommonConst.KEY_FILE);
         }

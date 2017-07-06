@@ -2,6 +2,7 @@ package com.jay.test;
 
 import java.io.File;
 import java.nio.file.spi.FileTypeDetector;
+import java.util.HashSet;
 
 import com.jay.csp.aws.AWSService;
 import com.jay.csp.azure.AZUREService;
@@ -27,6 +28,7 @@ public class JayTest {
 		FileHandler fh = new FileHandler();
 		
 		try {
+			
 			System.out.println("Start Split : "+TimeUtil.getCurrentTime(CommonConst.DATETIME_FORMAT));
 			if(fh.isASCII(sSourceFilePath)){
 				fh.writeSerEncFile(fh.splitFile4ASCII(sSourceFilePath, 4), sMetaPath, sMetaFile);
@@ -39,12 +41,15 @@ public class JayTest {
 				fh.mergeFile4Binary(sMetaPath+sMetaFile, sBINTargetFile);
 				System.out.println("Merge END : "+TimeUtil.getCurrentTime(CommonConst.DATETIME_FORMAT));
 			}
+			
+			
 //			AWSService AWS = new AWSService();
 //			AWS.uploadFile(new File(sMetaPath+sMetaFile));
 //			AZUREService AZS = new AZUREService();
 //			AZS.uploadFile(new File(sMetaPath+sMetaFile));
 //			GCPService GCS = new GCPService();
 //			GCS.uploadFile(new File(sMetaPath+sMetaFile));
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

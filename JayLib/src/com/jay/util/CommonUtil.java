@@ -147,8 +147,8 @@ public class CommonUtil {
         int iTempIdx = 0;
         while(true){
             iTempIdx = (int)(Math.random() * 100);
-            if(iTempIdx<CommonConst.sAlphabetChar.length){
-                sUniqueID.append(CommonConst.sAlphabetChar[iTempIdx]);
+            if(iTempIdx<CommonConst.sAlphabetDecimalChar.length){
+                sUniqueID.append(CommonConst.sAlphabetDecimalChar[iTempIdx]);
             }
             if(sUniqueID.length()==24) break;
         }

@@ -1,24 +1,33 @@
 package com.jay.util;
 
-import java.io.*;
-import java.nio.ByteBuffer;
+import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.RandomAccessFile;
+import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.text.DateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Vector;
 
-import org.apache.commons.codec.binary.Base64InputStream;
 import org.apache.commons.codec.binary.Base64OutputStream;
-import org.mozilla.intl.chardet.HtmlCharsetDetector;
-
-import com.j256.simplemagic.ContentInfo;
-import com.j256.simplemagic.ContentInfoUtil;
-
-import info.monitorenter.cpdetector.io.ASCIIDetector;
-import info.monitorenter.cpdetector.io.ByteOrderMarkDetector;
-import info.monitorenter.cpdetector.io.CodepageDetectorProxy;
-import info.monitorenter.cpdetector.io.JChardetFacade;
-import info.monitorenter.cpdetector.io.ParsingDetector;
 
 /**
  * 
@@ -188,7 +197,7 @@ public class FileHandler {
         int iTemp = 0;
 //        System.out.println((int)(Math.random() * 1000));
         for(int i=0;i<iSplitCnt;i++){
-        	iTemp = (int)(Math.random() * 20);
+        	iTemp = (int)(Math.random() * 1024);
         	if(iTemp==0) iTemp = 1;     
         	iSaltLengths.add(iTemp);
         	saUniqueKey[i] = CommonUtil.makeUniqueID(iTemp);
@@ -198,7 +207,7 @@ public class FileHandler {
         ArrayList<String> splitFileNames = new ArrayList();
         
         for(int i=0;i<iSplitCnt;i++){
-        	splitFileNames.add(sSourcePath.substring(0,sSourcePath.lastIndexOf("\\")+1)+CommonUtil.makeUniqueID(24));
+        	splitFileNames.add(sSourcePath.substring(0,sSourcePath.lastIndexOf("\\")+1)+CommonUtil.makeUniqueID(32));
         }
         
         ret.put(CommonConst.SPLIT_FILE_NAMES, splitFileNames);
@@ -240,34 +249,40 @@ public class FileHandler {
  			byte [] aTempArray = new byte[iBufferSize];
 // System.out.println("iBufferSize: "+iBufferSize);
  
+ 			int iTempArrayLength = CommonConst.BYTE_LENGTH;
  
-			for(int i=0;i<iSplitCnt;i++){
-				iTemp = (int)(Math.random() * 20);
-			 	if(iTemp==0) iTemp = 1;        
-			 	else if(iTemp > iEncArrayLength) iTemp = iEncArrayLength;
-			 	iSaltPositions.add(iTemp);
-			}
-			ret.put(CommonConst.SALT_POSITION, iSaltPositions);			  
-// System.out.println(ret);           
-        	        	
  			for(int i=0;i<iSplitCnt;i++){
      			fOutFile = new File(splitFileNames.get(i));
             	fOut = new FileOutputStream(fOutFile);
             	
             	aTempArray = Arrays.copyOfRange(aOriginArray, i*iBufferSize,  (i+1)*iBufferSize);
+            	
+            	if(iBufferSize < iTempArrayLength) iTempArrayLength = iBufferSize;
+// System.out.println("iTempArrayLength: "+iTempArrayLength);          
+ 
+            	iTemp = (int)(Math.random() * iTempArrayLength);
+			 	if(iTemp==0) iTemp = 1;        
+			 	else if(iTemp > iTempArrayLength) iTemp = iTempArrayLength;
+			 	iSaltPositions.add(iTemp);
+            	
+            	
+            	
 //  System.out.println("aTempArray.length: "+aTempArray.length);
     			encFirstArray = Arrays.copyOfRange(aTempArray, 0, (Integer)iSaltPositions.get(i));
     			encLastArray = Arrays.copyOfRange(aTempArray, (Integer)iSaltPositions.get(i), aTempArray.length);
     			
-//    			System.out.println("encFirstArray:"+new String(encFirstArray));
-//    			System.out.println("encLastArray:"+new String(encLastArray));
+//  System.out.println("encFirstArray:"+new String(encFirstArray));
+//  System.out.println("encLastArray:"+new String(encLastArray));
     			
     			fOut.write(CaseManipulation.toToggleCase(new String(encFirstArray)).getBytes());
     			fOut.write(saUniqueKey[i].getBytes());
 //    			fOut.write(CaseManipulation.toToggleCase(new String(encLastArray)).getBytes());
     			fOut.write(new String(encLastArray).getBytes());
     			fOut.flush();
-            }            
+            }         
+ 			
+ 			ret.put(CommonConst.SALT_POSITION, iSaltPositions);	
+// System.out.println(ret);    			
         }catch(Exception e){
         	e.printStackTrace();
             throw new JayException(e);
@@ -279,7 +294,7 @@ public class FileHandler {
                 throw new JayException(ex);
             }
         }
-//        System.out.println(ret);
+        System.out.println(ret);
 		return ret;
     }
     
@@ -305,7 +320,7 @@ public class FileHandler {
         
         try{
         	oMetaInfo = (HashMap)this.readSerEncFile(sMetaFilePath);
-        System.out.println(oMetaInfo);
+  System.out.println(oMetaInfo);
             ArrayList <String>aSplitFileList = (ArrayList)oMetaInfo.get(CommonConst.SPLIT_FILE_NAMES);
             
             file = new File(sOutPutFilePath);

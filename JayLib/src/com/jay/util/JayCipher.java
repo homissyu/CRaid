@@ -14,9 +14,16 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.security.InvalidKeyException;
 import java.security.Key;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.SecureRandom;
+import java.security.Security;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
 import javax.crypto.CipherOutputStream;
@@ -35,21 +42,29 @@ import org.apache.commons.codec.binary.Base64;
  */
 public class JayCipher {
     
-//    private static final String key;
-    
-    private  SecretKey sk = null;
-    private  byte[] raw = null;
-    private  SecretKeySpec keySpec = null;
-    private  Cipher cipher = null;       
+	private byte[] raw = null;
+    private SecretKeySpec keySpec = null;
+    private Cipher cipher = null; 
+    private static SecretKey sk = null;
     
     public JayCipher(){
+    	try {
+			chkKeyFile();
+			init();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+    
+    public JayCipher(SecretKey key) {
+    	sk = key;  
     	init();
     }
     
     public final void init(){
-        try {
-            chkKeyFile();
-            SecretKey sk = (SecretKey)this.readSerFile(System.getProperty(CommonConst.USER_DIR_PROP_KEY)+File.separator+CommonConst.LIB_DIR+File.separator+CommonConst.KEY_FILE);
+    	try {
+            Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
             raw = sk.getEncoded();
             keySpec = new SecretKeySpec(raw, CommonConst.AES);
             cipher=Cipher.getInstance(CommonConst.AES);            
@@ -111,11 +126,36 @@ public class JayCipher {
         }
     }
 
-    private static SecretKey generateRandomSecretKey(String algorithm) throws Exception{
+    public static SecretKey generateRandomSecretKey(String algorithm) throws Exception{
         KeyGenerator keyGen=KeyGenerator.getInstance(algorithm);
         keyGen.init(128);
         SecretKey key=keyGen.generateKey();
         return key;
+    }
+    
+    public byte[] encPKI(Key pubKey, String plainContents) throws NoSuchAlgorithmException, NoSuchProviderException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
+    	Cipher cipher = Cipher.getInstance("RSA/None/NoPadding", "BC");
+    	cipher.init(Cipher.ENCRYPT_MODE, pubKey);
+        byte[] cipherText = cipher.doFinal(plainContents.getBytes());
+        System.out.println("cipher: ("+ cipherText.length +")"+ new String(cipherText));
+        return cipherText;
+    }
+    
+    public byte[] decPKI(Key privKey, String encContents) throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+    	cipher.init(Cipher.DECRYPT_MODE, privKey);
+        byte[] plainText = cipher.doFinal(encContents.getBytes());
+        System.out.println("plain : " + new String(plainText));
+        return plainText;
+    }
+    
+    public static KeyPair generateRandomPublicKeyPair() throws NoSuchAlgorithmException, NoSuchProviderException, NoSuchPaddingException{
+    	SecureRandom random = new SecureRandom();
+        KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA", "BC");
+        generator.initialize(128, random); 
+        KeyPair pair = generator.generateKeyPair();
+        Key pubKey = pair.getPublic();
+        Key privKey = pair.getPrivate();
+        return pair;
     }
 
 //    private static String bytesToString(byte[] bytes){
@@ -137,7 +177,7 @@ public class JayCipher {
 //        	System.out.println(file.exists());
             Key aKey = generateRandomSecretKey(CommonConst.AES);
             FileHandler.writeSerFile( aKey, System.getProperty(CommonConst.USER_DIR_PROP_KEY)+File.separator+CommonConst.LIB_DIR, CommonConst.KEY_FILE);
-        }
+        }else sk = (SecretKey) FileHandler.readSerFile(System.getProperty(CommonConst.USER_DIR_PROP_KEY)+File.separator+CommonConst.LIB_DIR+File.separator+CommonConst.KEY_FILE);
     }
     
     

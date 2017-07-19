@@ -15,6 +15,7 @@ public class CommonConst{
     public static final String DESede = "DESede";
     public static final int ENCRYPT = 1;
     public static final int DECRYPT = 0;
+    public static final int PLAIN = 3;
     public static final int TEST = 2;
     public static final String T_DES = "TrippleDES";
     public static final String KEY_FILE = "jayk.dat";
@@ -50,8 +51,20 @@ public class CommonConst{
 	public static final String ID = "ID";
 	public static final String TEMP = "TEMP";
 	public static final String ORIGIN_STRING = "ORIGIN";
-	public static final Object ORIGIN_FILE_PATH = ORIGIN_STRING +"_"+ FILE_PATH;
-	public static final Object SPLIT_FILE_NAMES = "SPLIT_FILE_NAMES";
+	public static final String ORIGIN_FILE_PATH = ORIGIN_STRING +"_"+ FILE_PATH;
+	public static final String SPLIT_FILE_NAMES = "SPLIT_FILE_NAMES";
 	public static final String MERGE_STR = "merge_";
 	public static final int BYTE_LENGTH = 40960;
+	public static final String ORIGIN_FILE_NAME = "ORIGIN_FILE_NAME";
+	public static final String MANIPULATION_POSITION = "MANIPULATION_POSITION";
+	public static final String MANIPULATION_LENGTH = "MANIPULATION_LENGTH";
+	public static final String MANIPULATION_COUNT = "MANIPULATION_COUNT";
+	public static final Object SPLIT_FILE_NAME = "SPLIT_FILE_NAME";
+	public static final int MAX_MANIPULATION_LENGTH = 1024;
+	public static final int SYMMETRIC_KEY = 0;
+	public static final String SYMMETRIC_KEY_STR = "SYMMETRIC_KEY";
+	public static final int PUBLIC_KEY = 1;
+	public static final String MANIPULATION_INFO = "MANIPULATION_INFO";
+	public static final String DECRYPTED = "DECRYPTED";
+	public static final String ENCRYPTED = "ENCRYPTED";
 }

@@ -1,5 +1,7 @@
 package com.jay.util;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Scanner;
 
 public class CaseManipulation {
@@ -38,6 +40,42 @@ public class CaseManipulation {
        }
        return result;
    }
+   
+   public static String toToggleCaseInPostion(String inputString, ArrayList<Integer> positions, ArrayList<Integer> lengths) {
+       StringBuffer retBuf = null;
+       String aTempStr = inputString;
+       int iTempPosition = 0;
+       int iTempLength = 0;
+       String sOldTempStr = null;
+       String sNewTempStr = null;
+       
+//       System.out.println(positions);
+//       System.out.println(lengths);
+       
+       for(int i=0;i<positions.size();i++) {
+    	   retBuf = new StringBuffer();
+    	   iTempLength = lengths.get(i);
+    	   iTempPosition = positions.get(i);
+//    	   System.out.println("aTempStr:"+aTempStr);
+//    	   System.out.println("iTempLength:"+iTempLength);
+//    	   System.out.println("iTempPosition:"+iTempPosition);
+    	   sOldTempStr = aTempStr.substring(iTempPosition, iTempPosition+iTempLength);
+//    	   System.out.println("sOldTempStr:"+sOldTempStr);
+    	   sNewTempStr = CaseManipulation.toToggleCase(sOldTempStr);
+//    	   System.out.println("sNewTempStr:"+sNewTempStr);
+    	   
+    	   retBuf.append(aTempStr.substring(0, iTempPosition));
+//    	   System.out.println("1.retBuf:"+retBuf);
+    	   retBuf.append(sNewTempStr);
+//    	   System.out.println("2.retBuf:"+retBuf);
+    	   retBuf.append(aTempStr.substring(iTempPosition+iTempLength));
+    	   aTempStr = retBuf.toString();
+       }
+       return aTempStr;
+   }
+   
+   
+   
 
    public static String toCamelCase(String inputString) {
        String result = "";
@@ -93,17 +131,6 @@ public class CaseManipulation {
            }
        }
        return result;
-   }
-
-   public static void main(String[] args) {
-       Scanner scanner = new Scanner(System.in);
-       System.out.print("Enter an input String: ");
-       String inputString = scanner.nextLine();
-       System.out.println("Upper Case: " + toUpperCase(inputString));
-       System.out.println("Lower Case: " + toLowerCase(inputString));
-       System.out.println("Toggle Case: " + toToggleCase(inputString));
-       System.out.println("Camel Case: " + toCamelCase(inputString));
-       System.out.println("Title Case: " + toSentenceCase(inputString));
    }
 
 }

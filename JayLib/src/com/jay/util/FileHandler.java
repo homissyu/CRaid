@@ -2,8 +2,6 @@ package com.jay.util;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -18,17 +16,12 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.RandomAccessFile;
 import java.io.Serializable;
-import java.nio.file.Files;
 import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Vector;
-import java.util.concurrent.ThreadLocalRandom;
-
-import javax.crypto.SecretKey;
 
 import org.apache.commons.codec.binary.Base64OutputStream;
 
@@ -41,7 +34,6 @@ import org.apache.commons.codec.binary.Base64OutputStream;
 public class FileHandler {
     long lFileSize;
     static String sFileName;
-    private static final String sSubSystem = "FileHandler";
     HashMap<File, ArrayList<Integer>> mFileInfoMap = new HashMap<File, ArrayList<Integer>>();
 	ArrayList<ArrayList<String>> mFileInfoList = new ArrayList<ArrayList<String>>();
 	static JayCipher jc = new JayCipher();
@@ -57,7 +49,7 @@ public class FileHandler {
      * @throws IOException
      * @throws JayException
      */
-    public void copyFile(String sSourcePath, String sTargetPath, String[] saFileList) throws JayException, IOException {
+    public static void copyFile(String sSourcePath, String sTargetPath, String[] saFileList) throws JayException, IOException {
         for(int i=0;i<saFileList.length;i++) {
             File fInFile = new File(sSourcePath+File.separator+saFileList[i]);
             File fOutFile = new File(sTargetPath+File.separator+saFileList[i]);
@@ -135,7 +127,7 @@ public class FileHandler {
         }
     }
     
-    public void copy2Base64File(String sSourcePath, String sTargetPath, boolean bFlag) throws JayException {
+    public static void copy2Base64File(String sSourcePath, String sTargetPath, boolean bFlag) throws JayException {
         File fInFile = new File(sSourcePath);
         File fOutFile = new File(sTargetPath);
         FileInputStream in = null;
@@ -172,192 +164,8 @@ public class FileHandler {
         }
     }
     
-    /**
-     * 
-     * @param sSourcePath
-     * @param iSplitCnt
-     * @return
-     * @throws JayException
-     */
-    public MetaCraid splitFile4ASCII(String sSourcePath, int iSplitCnt) throws JayException{
-    	//try to use MetaCraid
+    private static MetaCraid splitOperation(String sSourcePath, ArrayList<Integer> sSplitRatio) {
     	MetaCraid meta = new MetaCraid();
-    	
-    	//try to use MetaCraid
-    	meta.setOriginFileType(CommonConst.ASCII);
-    	meta.setOriginFilePath(sSourcePath);
-    	meta.setId(CommonUtil.makeUniqueTimeID());
-    	meta.setOperationType(CommonConst.ENCRYPT);
-    	SecretKey sk = meta.getSecretKey();
-    	JayCipher userJc = new JayCipher(sk);
-    	int iEncArrayLength = 0;
-    	File fInFile = new File(sSourcePath);
-    	File fOutFile = null;
-        FileInputStream fIn = null;
-        FileOutputStream fOut = null;
-        
-        int iByteRead = 0;
-        int iBufferSize = 0;
-
-        ArrayList<String> splitFileNames = new ArrayList<String>();
-        
-        for(int i=0;i<iSplitCnt;i++){
-        	splitFileNames.add(sSourcePath.substring(0,sSourcePath.lastIndexOf("\\")+1)+CommonUtil.makeUniqueID(32));
-        }
-        
-        meta.setSplitFileNames(splitFileNames);
-
-        try {
-        	if(!fInFile.exists() || !fInFile.isFile())
-                throw new JayException("Can't split file : No such file or directory:"+sSourcePath);
-            if(!fInFile.canRead())
-                throw new JayException("Can't split file : Source file is unreadable:"+sSourcePath);
-            
-            fIn = new FileInputStream(fInFile);
-
-        	byte[] aOriginArray = new byte[(int)fInFile.length()];
-            
-            while(true) {
-            	iByteRead = fIn.read(aOriginArray);
-                if(iByteRead == -1)
-                    break;
-            }
-            
-            aOriginArray = userJc.encrypt(new String(aOriginArray)).getBytes();
-            
-            iEncArrayLength = aOriginArray.length;
-
-            if(iEncArrayLength%iSplitCnt==0) iBufferSize = iEncArrayLength/iSplitCnt;
-            else iBufferSize = (iEncArrayLength/iSplitCnt)+1;
- 			byte [] aTempArray = new byte[iBufferSize];
- 
- 			int iTempArrayLength = CommonConst.BYTE_LENGTH;
- 			
- 			for(int i=0;i<iSplitCnt;i++){
-     			fOutFile = new File(splitFileNames.get(i));
-            	fOut = new FileOutputStream(fOutFile);
-            	
-            	aTempArray = Arrays.copyOfRange(aOriginArray, i*iBufferSize,  (i+1)*iBufferSize);
-            	
-            	if(iBufferSize < iTempArrayLength) iTempArrayLength = iBufferSize;
-    			fOut.write(aTempArray);
-    			fOut.flush();
-            }
-        }catch(Exception e){
-        	e.printStackTrace();
-            throw new JayException(e);
-        }finally {
-            try {
-            	if(fIn != null) fIn.close();
-                if(fOut != null) fOut.close();
-            } catch (IOException ex) {
-                throw new JayException(ex);
-            }
-        }
-        //try to use MetaCraid
-        System.out.println(meta);
-        return meta;
-    }
-    
-    public ManipulationInfo makeManipulationInfo(String fileName, int targetLength) {
-    	ManipulationInfo meta = new ManipulationInfo(fileName);
-    	ArrayList<Integer> aTempManipulationPos = new ArrayList<Integer>();
-		ArrayList<Integer> aTempManipulationLength = new ArrayList<Integer>();
-		int iTempManipulationPosLimit = 0;
-		int iTempManipulationCnt = 0;
-		while(true) {
-			int iTempManipulationPos = ThreadLocalRandom.current().nextInt(iTempManipulationPosLimit, targetLength + 1);
-			int iTempManipulationLength = ThreadLocalRandom.current().nextInt(0, CommonConst.MAX_MANIPULATION_LENGTH);
-			iTempManipulationPosLimit = iTempManipulationPos+iTempManipulationLength;
-			if(targetLength<=iTempManipulationPosLimit) break;
-			aTempManipulationLength.add(iTempManipulationLength);
-			aTempManipulationPos.add(iTempManipulationPos);
-			iTempManipulationCnt++;
-		}
-		meta.setManipulationLengthPerFile(aTempManipulationLength);
-		meta.setManipulationPosPerFile(aTempManipulationPos);
-		meta.setManipulationCntPerFile(iTempManipulationCnt);
-		System.out.println(meta);	
-		return meta;
-    }
-    
-    /**
-     * 
-     * @param saInputFileList
-     * @param sSalt
-     * @param sOutPutFilePath
-     * @throws JayException
-     */
-    public static void mergeFile4ASCII(String sMetaFilePath, String sOutPutFilePath) throws JayException{
-    	File file = null;
-        FileOutputStream fos = null;
-        OutputStreamWriter osw = null;
-        BufferedWriter bw = null;
-        PrintWriter pw = null;
-        
-        try{
-  			MetaCraid meta = (MetaCraid)readSerEncFile(sMetaFilePath);
-  System.out.println(meta);
-  			JayCipher userCipher = new JayCipher(meta.getSecretKey());
-  
-            ArrayList <String>aSplitFileList = meta.getSplitFileNames();
-            
-            file = new File(sOutPutFilePath);
-            if(!file.exists())
-                file.createNewFile(); 
-
-            fos = new FileOutputStream(sOutPutFilePath);
-            osw = new OutputStreamWriter(fos, CommonConst.ENCODING);
-            bw = new BufferedWriter(osw);
-            pw = new PrintWriter(bw);
-            
-            File fInFile = null;
-            FileInputStream fIn = null;
-            byte[] buffer;
-            int bytes_read;
-            StringBuffer asBuf = new StringBuffer();
-            for(int i=0;i<aSplitFileList.size();i++) {
-            	fInFile = new File(aSplitFileList.get(i));
-                
-                if(!fInFile.exists() || !fInFile.isFile())
-                    throw new JayException("FileMerge:no such file or directory:"+"fInFile:"+aSplitFileList.get(i));
-                if(!fInFile.canRead())
-                    throw new JayException("FileMerge:source file is unreadable:"+"fInFile:"+aSplitFileList.get(i));
-                fIn = new FileInputStream(fInFile);
-
-                buffer = new byte[(int)fInFile.length()];
-                while(true) {
-                    bytes_read = fIn.read(buffer);
-                    if(bytes_read == -1)
-                        break;
-                }
-                asBuf.append(new String(buffer));
-            }
-            pw.print(userCipher.decrypt(asBuf.toString()));
-            fIn.close();
-            pw.close();
-            osw.close();
-            bw.close();
-            fos.close();
-            
-        }catch(Exception ex){
-        	ex.printStackTrace();
-            throw new JayException(ex);
-        }
-    }
-    
-    /**
-     * 
-     * @param sSourcePath
-     * @param iSplitCnt
-     * @return
-     * @throws JayException
-     */
-    public MetaCraid splitFile4Binary(String sSourcePath, int iSplitCnt) throws JayException{
-    	//try to use MetaCraid
-    	MetaCraid meta = new MetaCraid();
-    	
-    	//try to use MetaCraid
     	meta.setOriginFileType(CommonConst.BINARY);
     	meta.setOriginFilePath(sSourcePath);
     	meta.setId(CommonUtil.makeUniqueTimeID());
@@ -369,21 +177,25 @@ public class FileHandler {
 		RandomAccessFile raf = null;
 		File sourceFile = new File(sSourcePath);
 		File encryptedFile = new File(sSourcePath+CommonConst.CURRENT_DIR+CommonConst.ENCRYPTED);
-    	try{
+		
+		try{
     		CryptoUtils.encrypt(meta.getSecretKey(), sourceFile, encryptedFile);
     		raf = new RandomAccessFile(sSourcePath+CommonConst.CURRENT_DIR+CommonConst.ENCRYPTED, "r");
-            long sourceSize = raf.length();
-            long remainingBytes = sourceSize % iSplitCnt;
-            long bytesPerSplit = sourceSize/iSplitCnt ;
-            if((sourceSize % iSplitCnt) != 0)bytesPerSplit = bytesPerSplit+1;
-     		int maxReadBufferSize = 8 * 1024; //8KB
-     		
-     		String aTempFileName = null;
-
-     		for(int destIx=0; destIx < (iSplitCnt-1); destIx++) {
-     			aTempFileName = sSourcePath.substring(0,sSourcePath.lastIndexOf("\\")+1)+CommonUtil.makeUniqueID(24);
+    		long sourceSize = raf.length();
+            sourceSize = raf.length();
+            getSplitRatio(sourceSize, sSplitRatio);
+            meta.setSplitRatio(sSplitRatio);
+            
+            int iSplitCnt = sSplitRatio.size();
+            int maxReadBufferSize = 8 * 1024;
+            long bytesPerSplit = 0 ;
+            String aTempFileName = null;
+            for(int destIx=0; destIx < (iSplitCnt-1); destIx++) {
+            	bytesPerSplit = sSplitRatio.get(destIx);
+            	aTempFileName = sSourcePath.substring(0,sSourcePath.lastIndexOf("\\")+1)+CommonUtil.makeUniqueID(24);
      			bw = new BufferedOutputStream(new FileOutputStream(aTempFileName));
-            	if(bytesPerSplit > maxReadBufferSize) {
+     			
+     			if(bytesPerSplit > maxReadBufferSize) {
                     long numReads = bytesPerSplit/maxReadBufferSize;
                     long numRemainingRead = bytesPerSplit % maxReadBufferSize;
                     for(int i=0; i<numReads; i++) {
@@ -398,31 +210,235 @@ public class FileHandler {
                 bw.flush();
                 splitFileNames.add(aTempFileName);
             }
-            if(raf.getFilePointer()!=sourceSize || remainingBytes > 0) {
+            
+            long remainingBytes = sourceSize - raf.getFilePointer();
+
+            if(remainingBytes > 0) {
             	aTempFileName = sSourcePath.substring(0,sSourcePath.lastIndexOf("\\")+1)+CommonUtil.makeUniqueID(24);
             	bw = new BufferedOutputStream(new FileOutputStream(aTempFileName));
-            	readWrite(raf, bw, bytesPerSplit-remainingBytes);
+            	
+            	readWrite(raf, bw, remainingBytes);
                 bw.flush();
                 splitFileNames.add(aTempFileName);
+                sSplitRatio.set(sSplitRatio.size()-1, (int) remainingBytes);
             }
             meta.setSplitFileNames(splitFileNames);
-            
     	}catch(Exception e){
     		e.printStackTrace();
-    		throw new JayException(e);
     	}finally {
             try {
                 bw.close();
                 raf.close();
                 encryptedFile.delete();
             } catch (IOException ex) {
-                throw new JayException(ex);
+            	ex.printStackTrace();
             }
         }
     	return meta;
     }
     
-    private void readWrite(RandomAccessFile raf, OutputStream Os, long numBytes) throws IOException {
+    private static void getSplitRatio(long fileLength, ArrayList<Integer> sSplitRatio){
+    	int totalLength = 0;
+    	int itemCnt = sSplitRatio.size();
+    	int unitLength = 0;
+    	
+    	for(int i=0;i<itemCnt;i++) {
+    		totalLength = totalLength + sSplitRatio.get(i);
+    	} 
+    	
+    	if(totalLength % itemCnt == 0) unitLength = (int) (fileLength / totalLength);
+    	else unitLength = (int) ((fileLength/totalLength)+1);
+
+    	for(int i=0;i<itemCnt;i++) {
+    		sSplitRatio.set(i, sSplitRatio.get(i) * unitLength);
+    	}
+    }
+    
+    public static void splitFile(String sSourcePath, ArrayList<Integer> sSplitRatio) {
+    	try {
+    		FileHandler.writeSerEncFile(splitOperation(sSourcePath, sSplitRatio), CommonConst.META_FILE_PATH, CommonConst.META_FILE_NAME);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+    
+    public static void mergeFile(String sMetaFilePath, String sTargetPath) {
+    	try {
+    		MetaCraid meta = (MetaCraid)readSerEncFile(sMetaFilePath);
+    		mergeOperation(meta, sTargetPath);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+    
+//    private ManipulationInfo makeManipulationInfo(String fileName, int targetLength) {
+//    	ManipulationInfo meta = new ManipulationInfo(fileName);
+//    	ArrayList<Integer> aTempManipulationPos = new ArrayList<Integer>();
+//		ArrayList<Integer> aTempManipulationLength = new ArrayList<Integer>();
+//		int iTempManipulationPosLimit = 0;
+//		int iTempManipulationCnt = 0;
+//		while(true) {
+//			int iTempManipulationPos = ThreadLocalRandom.current().nextInt(iTempManipulationPosLimit, targetLength + 1);
+//			int iTempManipulationLength = ThreadLocalRandom.current().nextInt(0, CommonConst.MAX_MANIPULATION_LENGTH);
+//			iTempManipulationPosLimit = iTempManipulationPos+iTempManipulationLength;
+//			if(targetLength<=iTempManipulationPosLimit) break;
+//			aTempManipulationLength.add(iTempManipulationLength);
+//			aTempManipulationPos.add(iTempManipulationPos);
+//			iTempManipulationCnt++;
+//		}
+//		meta.setManipulationLengthPerFile(aTempManipulationLength);
+//		meta.setManipulationPosPerFile(aTempManipulationPos);
+//		meta.setManipulationCntPerFile(iTempManipulationCnt);
+//		System.out.println(meta);	
+//		return meta;
+//    }
+    
+    /**
+     * 
+     * @param saInputFileList
+     * @param sSalt
+     * @param sOutPutFilePath
+     * @throws JayException
+     */
+//    @SuppressWarnings("resource")
+//	public static void mergeFile4ASCII(MetaCraid meta, String sOutPutFilePath) throws JayException{
+//    	File file = null;
+//        FileOutputStream fos = null;
+//        OutputStreamWriter osw = null;
+//        BufferedWriter bw = null;
+//        PrintWriter pw = null;
+//        
+//        try{
+////  			MetaCraid meta = (MetaCraid)readSerEncFile(sMetaFilePath);
+//  System.out.println(meta);
+//  			JayCipher userCipher = new JayCipher(meta.getSecretKey());
+//  
+//            ArrayList <String>aSplitFileList = meta.getSplitFileNames();
+//            
+//            file = new File(sOutPutFilePath);
+//            if(!file.exists())
+//                file.createNewFile(); 
+//
+//            fos = new FileOutputStream(sOutPutFilePath);
+//            osw = new OutputStreamWriter(fos, CommonConst.ENCODING);
+//            bw = new BufferedWriter(osw);
+//            pw = new PrintWriter(bw);
+//            
+//            File fInFile = null;
+//            FileInputStream fIn = null;
+//            byte[] buffer;
+//            int bytes_read;
+//            StringBuffer asBuf = new StringBuffer();
+//            for(int i=0;i<aSplitFileList.size();i++) {
+//            	fInFile = new File(aSplitFileList.get(i));
+//                
+//                if(!fInFile.exists() || !fInFile.isFile())
+//                    throw new JayException("FileMerge:no such file or directory:"+"fInFile:"+aSplitFileList.get(i));
+//                if(!fInFile.canRead())
+//                    throw new JayException("FileMerge:source file is unreadable:"+"fInFile:"+aSplitFileList.get(i));
+//                
+//                fIn = new FileInputStream(fInFile);
+//
+//                buffer = new byte[(int)fInFile.length()];
+//                while(true) {
+//                    bytes_read = fIn.read(buffer);
+//                    if(bytes_read == -1)
+//                        break;
+//                }
+//                asBuf.append(new String(buffer));
+//            }
+//            pw.print(userCipher.decrypt(asBuf.toString()));
+//            fIn.close();
+//            pw.close();
+//            osw.close();
+//            bw.close();
+//            fos.close();
+//            
+//        }catch(Exception ex){
+//        	ex.printStackTrace();
+//            throw new JayException(ex);
+//        }
+//    }
+    
+    /**
+     * 
+     * @param sSourcePath
+     * @param iSplitCnt
+     * @return
+     * @throws JayException
+     */
+//    public static MetaCraid splitFile4Binary(String sSourcePath, int iSplitCnt) throws JayException{
+//    	//try to use MetaCraid
+//    	MetaCraid meta = new MetaCraid();
+//    	
+//    	//try to use MetaCraid
+//    	meta.setOriginFileType(CommonConst.BINARY);
+//    	meta.setOriginFilePath(sSourcePath);
+//    	meta.setId(CommonUtil.makeUniqueTimeID());
+//    	meta.setOperationType(CommonConst.ENCRYPT);
+//    	
+//    	ArrayList<String> splitFileNames = new ArrayList<String>();
+//        
+//        BufferedOutputStream bw = null;	
+//		RandomAccessFile raf = null;
+//		File sourceFile = new File(sSourcePath);
+//		File encryptedFile = new File(sSourcePath+CommonConst.CURRENT_DIR+CommonConst.ENCRYPTED);
+//    	try{
+//    		CryptoUtils.encrypt(meta.getSecretKey(), sourceFile, encryptedFile);
+//    		raf = new RandomAccessFile(sSourcePath+CommonConst.CURRENT_DIR+CommonConst.ENCRYPTED, "r");
+//            long sourceSize = raf.length();
+//            long remainingBytes = sourceSize % iSplitCnt;
+//            long bytesPerSplit = sourceSize/iSplitCnt ;
+//            if((sourceSize % iSplitCnt) != 0)bytesPerSplit = bytesPerSplit+1;
+//     		int maxReadBufferSize = 8 * 1024; //8KB
+//     		
+//     		String aTempFileName = null;
+//
+//     		for(int destIx=0; destIx < (iSplitCnt-1); destIx++) {
+//     			aTempFileName = sSourcePath.substring(0,sSourcePath.lastIndexOf("\\")+1)+CommonUtil.makeUniqueID(24);
+//     			bw = new BufferedOutputStream(new FileOutputStream(aTempFileName));
+//            	if(bytesPerSplit > maxReadBufferSize) {
+//                    long numReads = bytesPerSplit/maxReadBufferSize;
+//                    long numRemainingRead = bytesPerSplit % maxReadBufferSize;
+//                    for(int i=0; i<numReads; i++) {
+//                        readWrite(raf, bw, maxReadBufferSize);
+//                    }
+//                    if(numRemainingRead > 0) {
+//                        readWrite(raf, bw, numRemainingRead);
+//                    }
+//                }else {
+//                    readWrite(raf, bw, bytesPerSplit);
+//                }
+//                bw.flush();
+//                splitFileNames.add(aTempFileName);
+//            }
+//            if(raf.getFilePointer()!=sourceSize || remainingBytes > 0) {
+//            	aTempFileName = sSourcePath.substring(0,sSourcePath.lastIndexOf("\\")+1)+CommonUtil.makeUniqueID(24);
+//            	bw = new BufferedOutputStream(new FileOutputStream(aTempFileName));
+//            	readWrite(raf, bw, bytesPerSplit-remainingBytes);
+//                bw.flush();
+//                splitFileNames.add(aTempFileName);
+//            }
+//            meta.setSplitFileNames(splitFileNames);
+//            
+//    	}catch(Exception e){
+//    		e.printStackTrace();
+//    		throw new JayException(e);
+//    	}finally {
+//            try {
+//                bw.close();
+//                raf.close();
+//                encryptedFile.delete();
+//            } catch (IOException ex) {
+//                throw new JayException(ex);
+//            }
+//        }
+//    	return meta;
+//    }
+    
+    private static void readWrite(RandomAccessFile raf, OutputStream Os, long numBytes) throws IOException {
         byte[] buf = new byte[(int) numBytes];
         int val = raf.read(buf);
         if(val != -1) {
@@ -438,9 +454,8 @@ public class FileHandler {
         }   	
       }
     
-    public static void mergeFile4Binary(String sMetaFilePath, String sOutPutFilePath) throws JayException{
-    	MetaCraid meta = (MetaCraid)readSerEncFile(sMetaFilePath);
-    	System.out.println(meta);
+    public static void mergeOperation(MetaCraid meta, String sOutPutFilePath) throws JayException{
+//    	System.out.println(meta);
         ArrayList<String> aSplitFileList = meta.getSplitFileNames();
     	
         FileOutputStream fOs = null;
@@ -461,7 +476,6 @@ public class FileHandler {
 				try {
 					if(fOs != null) fOs.close();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 					throw new JayException(e);
 				}
@@ -474,7 +488,7 @@ public class FileHandler {
      * @param sPath
      * @throws JayException
      */
-    public void writeFile(String sFileName, String content, String sPath) throws JayException{
+    public static void writeFile(String sFileName, String content, String sPath) throws JayException{
         String sFilePath = sPath + File.separator + sFileName;
         File file = null;
         FileOutputStream fos = null;
@@ -570,7 +584,7 @@ public class FileHandler {
      * @param sPath
      * @throws JayException
      */
-    public static void writeSerEncFile(Object obj, String sPath, String sFileName) throws JayException{
+    private static void writeSerEncFile(Object obj, String sPath, String sFileName) throws JayException{
         ObjectOutputStream oos = null;
         File file = null;
         String sFilePath = sPath + File.separator + sFileName;
@@ -582,7 +596,7 @@ public class FileHandler {
             if(!file.exists())
                 file.createNewFile(); 
             
-            oos = new ObjectOutputStream(new FileOutputStream(sPath+File.separator+sFileName));
+            oos = new ObjectOutputStream(new FileOutputStream(sFilePath));
             
             jc.encrypt((Serializable) obj, oos);
             
@@ -602,7 +616,7 @@ public class FileHandler {
      * @return oRet
      * @throws JayException
      */
-    public static Object readSerEncFile(String sFileName){
+    private static Object readSerEncFile(String sFileName){
         FileInputStream fileIn = null;
         Object oRet = null;
         File file = null;
@@ -628,15 +642,16 @@ public class FileHandler {
     /**
      * @return lFileSize
      */
-    public long getFileSize(){
-        return lFileSize;
+    public static long getFileSize(String filePath){
+    	File file = new File(filePath);
+        return file.length();
     }
     
     /**
      * @return sFileName
      */
-    public String getFileName(){
-        return sFileName;
+    public static String getFileName(String filePath){
+    	return filePath.substring(0,filePath.lastIndexOf("\\")+1);
     }
 
     /**
@@ -653,7 +668,7 @@ public class FileHandler {
      * @param sFileName
      * @throws Exception
      */
-    public void remove(String sFilePath, String sFileName) throws Exception{
+    public static void remove(String sFilePath, String sFileName) throws Exception{
         File fFile = new File(sFilePath+File.separator+sFileName);
         fFile.delete();
     }
@@ -664,7 +679,7 @@ public class FileHandler {
      * @throws IOException
      * @throws JayException
      */
-    public void removeFiles(String sFilePath, Vector vecFileList) throws IOException, JayException {
+    public static void removeFiles(String sFilePath, Vector<?> vecFileList) throws IOException, JayException {
         for(int i=0;i<vecFileList.size();i++) {
             File fFile = new File(sFilePath+File.separator+vecFileList.elementAt(i).toString());
             fFile.delete();
@@ -682,7 +697,7 @@ public class FileHandler {
      * @throws IOException
      * @throws JayException
      */
-    public void copyFile(String sSourcePath, String sTargetPath, String[] saFileList, String[] saFileUploadList) throws IOException, JayException {
+    public static void copyFile(String sSourcePath, String sTargetPath, String[] saFileList, String[] saFileUploadList) throws IOException, JayException {
         for(int i=0;i<saFileList.length;i++) {
             File fInFile = new File(sSourcePath+File.separator+saFileUploadList[i]);
             File fOutFile = new File(sTargetPath+File.separator+saFileList[i]);
@@ -716,28 +731,11 @@ public class FileHandler {
     
     /**
      * 
-     * @param sPath
-     * @param iOffSet
-     * @param iLength
-     * @throws FileNotFoundException
-     * @throws IOException
-     */
-    public void accessFile(String sPath, long iOffSet, int iLength) throws FileNotFoundException, IOException{
-        iOffSet = 0L;
-        String sMode = "r";
-        RandomAccessFile raf = new RandomAccessFile(sPath, sMode);
-        raf.seek(iOffSet);
-    }
-    
-    
-    
-    /**
-     * 
      * @param filename
      * @return bResult
      * @throws JayException 
      */
-    public boolean isASCII(String filename) throws JayException {
+    public static boolean isASCII(String filename) throws JayException {
 		 
 		boolean bResult = false;
 		 
@@ -746,8 +744,8 @@ public class FileHandler {
         try {
             inputStream = new FileReader(filename);
  
-            File f = new File(filename);
-            byte [] buffer = new byte[(int)f.length()]; 
+//            File f = new File(filename);
+//            byte [] buffer = new byte[(int)f.length()]; 
         	int c;
             while ((c = inputStream.read()) != -1) {
  
@@ -796,16 +794,17 @@ public class FileHandler {
      * @return mFileInfoList
      * @throws Exception
      */
-    public ArrayList getFileInfoList(File aFile) throws Exception{
+    public static ArrayList<ArrayList<String>> getFileInfoList(File aFile) throws Exception{
+    	ArrayList<ArrayList<String>> ret = new ArrayList<ArrayList<String>>();
 		if (aFile.isDirectory()) {
             String[] children = aFile.list();
             for (int i=0; i<children.length; i++) {            	
             	getFileInfoList(new File(aFile, children[i]));
             }
         } else {
-        	mFileInfoList.add(getFileInfo(aFile));
+        	ret.add(getFileInfo(aFile));
         }
-		return mFileInfoList;
+		return ret;
 	}
 	
     /**
@@ -814,7 +813,7 @@ public class FileHandler {
      * @return aFileInfoList
      * @throws Exception
      */
-	private ArrayList<String> getFileInfo(File src) throws JayException{
+	private static ArrayList<String> getFileInfo(File src) throws JayException{
 		ArrayList<String> aFileInfoList = new ArrayList<String>();
 		aFileInfoList.add(0,src.getName());
 		aFileInfoList.add(1,src.getAbsolutePath());
@@ -837,7 +836,6 @@ public class FileHandler {
 					if(isr!=null)isr.close();
 					if(fis!=null)fis.close();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					throw new JayException(e);
 				}
 		}
@@ -847,6 +845,12 @@ public class FileHandler {
 		
 		return aFileInfoList;
 	}
+
+
+	
+
+
+	
 	
 	
 

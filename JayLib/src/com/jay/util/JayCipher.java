@@ -122,6 +122,7 @@ public class JayCipher {
             }
             return new String(decrypted);
         }catch(Exception e){
+        	e.printStackTrace();
             throw new RuntimeException("decryption failuer", e);
         }
     }

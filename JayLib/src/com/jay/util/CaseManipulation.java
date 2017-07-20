@@ -1,8 +1,6 @@
 package com.jay.util;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Scanner;
 
 public class CaseManipulation {
 
@@ -49,25 +47,15 @@ public class CaseManipulation {
        String sOldTempStr = null;
        String sNewTempStr = null;
        
-//       System.out.println(positions);
-//       System.out.println(lengths);
-       
        for(int i=0;i<positions.size();i++) {
     	   retBuf = new StringBuffer();
     	   iTempLength = lengths.get(i);
     	   iTempPosition = positions.get(i);
-//    	   System.out.println("aTempStr:"+aTempStr);
-//    	   System.out.println("iTempLength:"+iTempLength);
-//    	   System.out.println("iTempPosition:"+iTempPosition);
     	   sOldTempStr = aTempStr.substring(iTempPosition, iTempPosition+iTempLength);
-//    	   System.out.println("sOldTempStr:"+sOldTempStr);
     	   sNewTempStr = CaseManipulation.toToggleCase(sOldTempStr);
-//    	   System.out.println("sNewTempStr:"+sNewTempStr);
     	   
     	   retBuf.append(aTempStr.substring(0, iTempPosition));
-//    	   System.out.println("1.retBuf:"+retBuf);
     	   retBuf.append(sNewTempStr);
-//    	   System.out.println("2.retBuf:"+retBuf);
     	   retBuf.append(aTempStr.substring(iTempPosition+iTempLength));
     	   aTempStr = retBuf.toString();
        }

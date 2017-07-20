@@ -67,4 +67,7 @@ public class CommonConst{
 	public static final String MANIPULATION_INFO = "MANIPULATION_INFO";
 	public static final String DECRYPTED = "DECRYPTED";
 	public static final String ENCRYPTED = "ENCRYPTED";
+	public static final String SPLIT_RATIO = "SPLIT_RATIO";
+	public static final String META_FILE_NAME = "Meta.craid";
+	public static final String META_FILE_PATH = "c:\\";
 }

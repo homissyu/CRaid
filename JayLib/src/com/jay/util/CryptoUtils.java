@@ -9,12 +9,11 @@ import java.io.OutputStream;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
- 
+
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
-import javax.crypto.spec.SecretKeySpec;
 
 import org.bouncycastle.crypto.CryptoException;
  
@@ -24,7 +23,6 @@ import org.bouncycastle.crypto.CryptoException;
  *
  */
 public class CryptoUtils {
-    private static final String ALGORITHM = "AES";
     private static final String TRANSFORMATION = "AES";
  
     public static void encrypt(Key key, File inputFile, File outputFile)

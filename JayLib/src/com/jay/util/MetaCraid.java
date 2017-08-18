@@ -5,6 +5,8 @@ import java.util.ArrayList;
 
 import javax.crypto.SecretKey;
 
+import com.jay.cipher.JayCipher;
+
 public class MetaCraid implements Serializable {
 	private static final long serialVersionUID = -2518143671167959230L;
 	public static final String SERIAL_ID = CommonUtil.makeUniqueID(16);

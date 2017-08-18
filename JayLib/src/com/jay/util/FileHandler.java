@@ -25,6 +25,8 @@ import java.util.Vector;
 
 import org.apache.commons.codec.binary.Base64OutputStream;
 
+import com.jay.cipher.JayCipher;
+
 /**
  * 
  * @author Jay
@@ -36,8 +38,8 @@ public class FileHandler {
     static String sFileName;
     HashMap<File, ArrayList<Integer>> mFileInfoMap = new HashMap<File, ArrayList<Integer>>();
 	ArrayList<ArrayList<String>> mFileInfoList = new ArrayList<ArrayList<String>>();
-	static JayCipher jc = new JayCipher();
-	JayCipher userJc = null;
+//	static JayCipher jc = new JayCipher();
+//	JayCipher userJc = null;
 	public FileHandler(){
 	}
     
@@ -258,7 +260,6 @@ public class FileHandler {
     	try {
     		FileHandler.writeSerEncFile(splitOperation(sSourcePath, sSplitRatio), CommonConst.META_FILE_PATH, CommonConst.META_FILE_NAME);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
     }
@@ -268,7 +269,6 @@ public class FileHandler {
     		MetaCraid meta = (MetaCraid)readSerEncFile(sMetaFilePath);
     		mergeOperation(meta, sTargetPath);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -598,12 +598,9 @@ public class FileHandler {
             
             oos = new ObjectOutputStream(new FileOutputStream(sFilePath));
             
+            JayCipher jc = new JayCipher();
             jc.encrypt((Serializable) obj, oos);
             
-        	
-//            oos.writeObject(obj);
-
-//            oos.close();
         }catch(Exception ex){
         	ex.printStackTrace();
             throw new JayException(ex);
@@ -625,6 +622,7 @@ public class FileHandler {
             if(file.exists()){
                 fileIn = new FileInputStream(sFileName);
                 ObjectInputStream ois = new ObjectInputStream(fileIn);
+                JayCipher jc = new JayCipher();
                 oRet = jc.decrypt(ois);
             }
         } catch (Exception ex) {
@@ -847,11 +845,8 @@ public class FileHandler {
 	}
 
 
-	
-
-
-	
-	
-	
-
+	public static void writeSerFile(String encrypt, OutputStream ostream) {
+		// TODO Auto-generated method stub
+		
+	}
 }

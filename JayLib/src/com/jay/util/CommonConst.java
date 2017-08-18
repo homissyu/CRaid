@@ -1,5 +1,7 @@
 package com.jay.util;
 
+import java.security.SecureRandom;
+
 public class CommonConst{
     public static final String CURRENT_DIR = ".";
     public static final String WHITE_SPACE = " ";
@@ -11,6 +13,7 @@ public class CommonConst{
     
     public static final String EXCEPTION_FILE_PATH = "c:\\";
     public static final String AES = "AES";
+    public static final String AES_CBC_PKCS5 = "AES/CBC/PKCS5Padding";
     public static final String DES = "DES";
     public static final String DESede = "DESede";
     public static final int ENCRYPT = 1;
@@ -18,7 +21,9 @@ public class CommonConst{
     public static final int PLAIN = 3;
     public static final int TEST = 2;
     public static final String T_DES = "TrippleDES";
-    public static final String KEY_FILE = "jayk.dat";
+    public static final String SECRET_KEY_FILE = "jayk1.dat";
+    public static final String PBE_KEY_FILE = "jayk2.dat";
+    public static final String PKI_KEY_FILE = "jayk3.dat";
 
     public static final String USER_DIR_PROP_KEY = "user.dir";
     public static final String JAVA_HOME_PROP_KEY = "java.home";
@@ -70,4 +75,20 @@ public class CommonConst{
 	public static final String SPLIT_RATIO = "SPLIT_RATIO";
 	public static final String META_FILE_NAME = "Meta.craid";
 	public static final String META_FILE_PATH = "c:\\";
+	
+	public static final String[] CSP_ARRAY = {"AmazonDrive","box","DropBox","FlipDrive","GoogleDrive","HiDrive","Hubic","JumpShare","MEGA","pCloud","Sync.com","Syncplicity","Yandex","MediaFire"};
+	public static final int [] CSP_FREE_AMOUNT = {5,10,2,10,15,5,25,2,50,20,5,10,10,10};
+	public static final int JSON_TYPE = 0;
+	public static final int STREAM_TYPE = 1;
+	public static final int SECRET_KEY_TYPE = 0;
+	public static final int PKI_KEY_TYPE = 1;
+	public static final int PBE_KEY_TYPE = 2;
+	public static final int ENC_BYTE_32 = 256;
+	public static final int ENC_BYTE_64 = 512;
+	public static final String RSA_STRING = "RSA";
+	public static final String PROVIDER_BC = "BC";
+	public static final String RSA_NOPADDING_STR = "RSA/None/NoPadding";
+	public static final String PBKDF = "PBKDF2WithHmacSHA256";
+	public static final int ITERATION_CNT = 65536;
+	public static final int ENC_BYTE_16 = 128;
 }

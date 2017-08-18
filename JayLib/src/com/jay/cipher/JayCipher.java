@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.jay.util;
+package com.jay.cipher;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,6 +20,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 import java.security.Security;
+import java.security.spec.KeySpec;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,8 +33,14 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SealedObject;
 import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
+
 import org.apache.commons.codec.binary.Base64;
+
+import com.jay.util.CommonConst;
+import com.jay.util.FileHandler;
 
 
 /**
@@ -41,7 +48,7 @@ import org.apache.commons.codec.binary.Base64;
  * @author Jay
  */
 public class JayCipher {
-    
+	
 	private byte[] raw = null;
     private SecretKeySpec keySpec = null;
     private Cipher cipher = null; 
@@ -172,13 +179,13 @@ public class JayCipher {
 //    }
     
     private static void chkKeyFile() throws Exception{
-        File file = new File(System.getProperty(CommonConst.USER_DIR_PROP_KEY)+File.separator+CommonConst.LIB_DIR+File.separator+CommonConst.KEY_FILE);
+        File file = new File(System.getProperty(CommonConst.USER_DIR_PROP_KEY)+File.separator+CommonConst.LIB_DIR+File.separator+CommonConst.SECRET_KEY_FILE);
 //        System.out.println(file.getAbsolutePath());
         if(!file.exists()){
 //        	System.out.println(file.exists());
             Key aKey = generateRandomSecretKey(CommonConst.AES);
-            FileHandler.writeSerFile( aKey, System.getProperty(CommonConst.USER_DIR_PROP_KEY)+File.separator+CommonConst.LIB_DIR, CommonConst.KEY_FILE);
-        }else sk = (SecretKey) FileHandler.readSerFile(System.getProperty(CommonConst.USER_DIR_PROP_KEY)+File.separator+CommonConst.LIB_DIR+File.separator+CommonConst.KEY_FILE);
+            FileHandler.writeSerFile( aKey, System.getProperty(CommonConst.USER_DIR_PROP_KEY)+File.separator+CommonConst.LIB_DIR, CommonConst.SECRET_KEY_FILE);
+        }else sk = (SecretKey) FileHandler.readSerFile(System.getProperty(CommonConst.USER_DIR_PROP_KEY)+File.separator+CommonConst.LIB_DIR+File.separator+CommonConst.SECRET_KEY_FILE);
     }
     
     
@@ -220,4 +227,21 @@ public class JayCipher {
 		    }
         }
 	}
+	
+//	public static void main(String [] args) {
+//		String aTemp = "123456ÇÕ´Ï´Ù.abcde";
+//		
+//		JayCipher jc = new JayCipher();
+//		System.out.println("Key no password :"+sk);
+//		String aEnc = jc.encrypt(aTemp);
+//		System.out.println("Encrypted no password :"+aEnc);
+//		System.out.println("Decrypted no password :"+jc.decrypt(aEnc));
+//		//VlSLRllNnDZrLGQAm17RazXYmWf3vSgf3nVBNgxXt9s=
+//		jc = new JayCipher("aaaaaaaaaa");
+//		System.out.println("Key password :"+sk);
+//		aEnc = jc.encrypt(aTemp);
+//		System.out.println("Encrypted no password :"+aEnc);
+//		System.out.println("Decrypted no password :"+jc.decrypt(aEnc));
+//		
+//	}
 }

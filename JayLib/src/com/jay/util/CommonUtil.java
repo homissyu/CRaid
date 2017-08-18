@@ -176,7 +176,7 @@ public class CommonUtil {
     
     public void printSystemInfo(){
         Properties prop = System.getProperties();
-        Iterator it = prop.keySet().iterator();
+        Iterator<?> it = prop.keySet().iterator();
         String aTempKey = null;
         System.out.println("System properties");
         while(it.hasNext()){
@@ -184,7 +184,7 @@ public class CommonUtil {
             System.out.println("Key:"+aTempKey+"==>"+prop.get(aTempKey));
 
         }
-        Map env = System.getenv();
+        Map<?, ?> env = System.getenv();
         it = env.keySet().iterator();
         System.out.println("System env");
         while(it.hasNext()){
@@ -195,7 +195,7 @@ public class CommonUtil {
     
     public static void getSystemProps(){
         Properties pt = System.getProperties();
-        Iterator it = pt.keySet().iterator();
+        Iterator<?> it = pt.keySet().iterator();
         String tempKey = null;
         while(it.hasNext()){
             tempKey = (String)it.next();
@@ -205,8 +205,8 @@ public class CommonUtil {
     
     public static void getSystemEnvs(){
         String tempKey = null;
-        Map envMap = System.getenv();
-        Iterator it = envMap.keySet().iterator();
+        Map<?, ?> envMap = System.getenv();
+        Iterator<?> it = envMap.keySet().iterator();
         while(it.hasNext()){
             tempKey = (String)it.next();
             System.out.println("envKey:"+tempKey+":"+System.getenv(tempKey));

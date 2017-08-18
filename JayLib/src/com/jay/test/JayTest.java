@@ -19,10 +19,9 @@ public class JayTest {
 		
 		try {
 			ArrayList<Integer> aSplitRatio = new ArrayList<Integer>();
-			aSplitRatio.add(10);
-			aSplitRatio.add(30);
-			aSplitRatio.add(2);
-			aSplitRatio.add(5);
+			for(int i=0;i<CommonConst.CSP_FREE_AMOUNT.length;i++) {
+				aSplitRatio.add(CommonConst.CSP_FREE_AMOUNT[i]);
+			}
 			
 			System.out.println("Start Split : "+TimeUtil.getCurrentTime(CommonConst.DATETIME_FORMAT));
 			FileHandler.splitFile(sSourceFilePath, aSplitRatio);

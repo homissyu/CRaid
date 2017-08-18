@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CSPS>
+	<CSP>
+		<ID>1</ID>
+		<Name>pCloud</Name>
+		<MainURL><![CDATA[https://www.pcloud.com/]]></MainURL>
+		<UploadType></UploadType>
+		<DownloadType></DownloadType>
+		<UploadString></UploadString>
+		<UploadIP></UploadIP>
+		<Quota>10000</Quota>
+		<Usage>0</Usage>
+		<UserId><![CDATA[homissyu@naver.com]]></UserId>
+		<Password><![CDATA[0608choi]]></Password>
+	</CSP>
+</CSPS>

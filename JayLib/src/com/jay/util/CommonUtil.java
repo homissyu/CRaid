@@ -169,11 +169,6 @@ public class CommonUtil {
         return sUniqueID.toString();
     }
     
-    public static void main(String[] args){
-        CommonUtil cu = new CommonUtil();
-        cu.printSystemInfo();
-    }
-    
     public void printSystemInfo(){
         Properties prop = System.getProperties();
         Iterator<?> it = prop.keySet().iterator();

@@ -25,8 +25,6 @@ import java.util.Vector;
 
 import org.apache.commons.codec.binary.Base64OutputStream;
 
-import com.jay.cipher.JayCipher;
-
 /**
  * 
  * @author Jay
@@ -167,22 +165,29 @@ public class FileHandler {
     }
     
     private static MetaCraid splitOperation(String sSourcePath, ArrayList<Integer> sSplitRatio) {
-    	MetaCraid meta = new MetaCraid();
-    	meta.setOriginFileType(CommonConst.BINARY);
-    	meta.setOriginFilePath(sSourcePath);
-    	meta.setId(CommonUtil.makeUniqueTimeID());
-    	meta.setOperationType(CommonConst.ENCRYPT);
-    	
-    	ArrayList<String> splitFileNames = new ArrayList<String>();
-        
-        BufferedOutputStream bw = null;	
+    	MetaCraid meta = null;
+    	ArrayList<String> splitFileNames = null;
+    	BufferedOutputStream bw = null;	
 		RandomAccessFile raf = null;
-		File sourceFile = new File(sSourcePath);
-		File encryptedFile = new File(sSourcePath+CommonConst.CURRENT_DIR+CommonConst.ENCRYPTED);
+		File sourceFile = null;
+		File encryptedFile = null;
+		String encryptedFilePath = null;
 		
 		try{
-    		CryptoUtils.encrypt(meta.getSecretKey(), sourceFile, encryptedFile);
-    		raf = new RandomAccessFile(sSourcePath+CommonConst.CURRENT_DIR+CommonConst.ENCRYPTED, "r");
+			encryptedFilePath = sSourcePath+CommonConst.CURRENT_DIR+CommonConst.ENCRYPTED;
+			sourceFile = new File(sSourcePath);
+			encryptedFile = new File(encryptedFilePath);
+			splitFileNames = new ArrayList<String>();
+			
+			meta = new MetaCraid();
+			meta.setOriginFileType(CommonConst.BINARY);
+	    	meta.setOriginFilePath(sSourcePath);
+	    	meta.setId(CommonUtil.makeUniqueTimeID());
+	    	meta.setOperationType(CommonConst.ENCRYPT);
+	    	meta.setSecretKey(CryptoUtils.generateRandomSecretKey(CommonConst.AES));
+    		
+	    	CryptoUtils.encrypt(meta.getSecretKey(), sourceFile, encryptedFile);
+    		raf = new RandomAccessFile(encryptedFilePath, "r");
     		long sourceSize = raf.length();
             sourceSize = raf.length();
             getSplitRatio(sourceSize, sSplitRatio);
@@ -455,7 +460,7 @@ public class FileHandler {
       }
     
     public static void mergeOperation(MetaCraid meta, String sOutPutFilePath) throws JayException{
-//    	System.out.println(meta);
+    	System.out.println(meta);
         ArrayList<String> aSplitFileList = meta.getSplitFileNames();
     	
         FileOutputStream fOs = null;
@@ -597,9 +602,7 @@ public class FileHandler {
                 file.createNewFile(); 
             
             oos = new ObjectOutputStream(new FileOutputStream(sFilePath));
-            
-            JayCipher jc = new JayCipher();
-            jc.encrypt((Serializable) obj, oos);
+            CryptoUtils.encryptObj((Serializable) obj, oos, CryptoUtils.chkKeyFile());
             
         }catch(Exception ex){
         	ex.printStackTrace();
@@ -622,8 +625,9 @@ public class FileHandler {
             if(file.exists()){
                 fileIn = new FileInputStream(sFileName);
                 ObjectInputStream ois = new ObjectInputStream(fileIn);
-                JayCipher jc = new JayCipher();
-                oRet = jc.decrypt(ois);
+                
+                oRet = CryptoUtils.decryptObj(ois, CryptoUtils.chkKeyFile());
+                
             }
         } catch (Exception ex) {
         	ex.printStackTrace();
@@ -842,11 +846,5 @@ public class FileHandler {
 		aFileInfoList.add(7, df.format(dt));
 		
 		return aFileInfoList;
-	}
-
-
-	public static void writeSerFile(String encrypt, OutputStream ostream) {
-		// TODO Auto-generated method stub
-		
 	}
 }

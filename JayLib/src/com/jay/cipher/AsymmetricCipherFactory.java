@@ -31,7 +31,7 @@ import javax.crypto.spec.SecretKeySpec;
 import com.jay.util.CommonConst;
 
 public class AsymmetricCipherFactory {
-	private static void createKey(String password) throws Exception {
+	private static void createKey(char [] password) throws Exception {
 
         // RSA 키 쌍 생성
 
@@ -46,7 +46,7 @@ public class AsymmetricCipherFactory {
         fos.close();
 
         // 개인 키를 암호화한 후에 파일에 쓴다.
-        byte[] privateKeyBytes = passwordEncrypt(password.toCharArray(), keyPair.getPrivate().getEncoded());
+        byte[] privateKeyBytes = passwordEncrypt(password, keyPair.getPrivate().getEncoded());
         fos = new FileOutputStream("c:\\privateKey");
         fos.write(publicKeyBytes);
         fos.close();
@@ -76,7 +76,7 @@ public class AsymmetricCipherFactory {
         return baos.toByteArray();
   }
 
-  private static void encrypt(String fileInput) throws Exception {
+  public static void encrypt(String fileInput) throws Exception {
         String publicKeyFileName = "c:\\publicKey";
 
         // 공개 키가 저장된 파일로부터 keyByte의 바이트 배열을 생성한다.
@@ -162,7 +162,7 @@ public class AsymmetricCipherFactory {
 	
 	
 	
-	private static void decrypt(String password, String fileInput) throws Exception {
+	public static void decrypt(char [] password, String fileInput) throws Exception {
 	
 	      String privateKeyFilename = "c:\\privateKey";
 	
@@ -179,7 +179,7 @@ public class AsymmetricCipherFactory {
 	      baos.close();
 	
 	       // 암호화된 개인 키 바이트를 복원한다.
-	      keyByte = passwordDecrypt(password.toCharArray(), keyByte);
+	      keyByte = passwordDecrypt(password, keyByte);
 	
 	      // RSA 개인 키를 복원한다.
 	      PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyByte);

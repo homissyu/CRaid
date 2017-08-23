@@ -4,8 +4,8 @@ import java.io.File;
 import java.util.ArrayList;
 
 import com.jay.util.CommonConst;
+import com.jay.util.CommonUtil;
 import com.jay.util.FileHandler;
-import com.jay.util.TimeUtil;
 
 public class JayTest {
 
@@ -23,13 +23,13 @@ public class JayTest {
 				aSplitRatio.add(CommonConst.CSP_FREE_AMOUNT[i]);
 			}
 			
-			System.out.println("Start Split : "+TimeUtil.getCurrentTime(CommonConst.DATETIME_FORMAT));
+			System.out.println("Start Split : "+CommonUtil.getCurrentTime(CommonConst.DATETIME_FORMAT));
 			FileHandler.splitFile(sSourceFilePath, aSplitRatio);
-			System.out.println("End Split : "+TimeUtil.getCurrentTime(CommonConst.DATETIME_FORMAT));
+			System.out.println("End Split : "+CommonUtil.getCurrentTime(CommonConst.DATETIME_FORMAT));
 			
-			System.out.println("Start Merge : "+TimeUtil.getCurrentTime(CommonConst.DATETIME_FORMAT));
+			System.out.println("Start Merge : "+CommonUtil.getCurrentTime(CommonConst.DATETIME_FORMAT));
 			FileHandler.mergeFile(sMetaFilePath, sTargetFilePath);
-			System.out.println("End Merge : "+TimeUtil.getCurrentTime(CommonConst.DATETIME_FORMAT));
+			System.out.println("End Merge : "+CommonUtil.getCurrentTime(CommonConst.DATETIME_FORMAT));
 			
 //			AWSService AWS = new AWSService();
 //			AWS.uploadFile(new File(sMetaPath+sMetaFile));

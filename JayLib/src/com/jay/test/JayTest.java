@@ -165,8 +165,6 @@ public class JayTest {
 			System.out.println(new String(recoverTTL));
 			
 			
-			
-			
 			PublicKey pubKey1 = CryptoUtils.getKeyPair("1").getPublic();
 			PublicKey pubKey2 = CryptoUtils.getKeyPair("1").getPublic();
 			PrivateKey key1 = CryptoUtils.getKeyPair("1").getPrivate();

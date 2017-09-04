@@ -50,7 +50,7 @@ public class CommonUtil {
                 result = new String(b);
                 result = result + lpad(" ", space," ");
                 return result;
-            } else if( b.length <= offset ) { // 占쏙옙占쏙옙占싶깍옙占싱븝옙占쏙옙 占쌘몌옙占퐐占� offset占쏙옙 커占쏙옙占� 占쏙옙占쏙옙 占쏙옙占쏙옙占싶몌옙 占쏙옙占쏙옙占쏘만큼占쏙옙 占쏙옙占�8占쏙옙 채占쏙옙占�.
+            } else if( b.length <= offset ) { 
                 return lpad(" ", length," ");
             } else {
                 System.arraycopy( b,

@@ -1,17 +1,24 @@
 package com.jay.util;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInput;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.security.InvalidKeyException;
 import java.security.Key;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -31,7 +38,7 @@ import org.bouncycastle.crypto.CryptoException;
  *
  */
 public class CryptoUtils {
-    private static final String TRANSFORMATION = "AES";
+    private static final String TRANSFORMATION = CommonConst.AES;
  
     public static void encrypt(Key key, File inputFile, File outputFile)
             throws CryptoException {
@@ -50,7 +57,7 @@ public class CryptoUtils {
         return key;
     }
     
-    public static Key chkKeyFile() throws Exception{
+    private static Key chkKeyFile() throws Exception{
     	SecretKey aKey = null;
         File file = new File(System.getProperty(CommonConst.USER_DIR_PROP_KEY)+File.separator+CommonConst.LIB_DIR+File.separator+CommonConst.SECRET_KEY_FILE);
         System.out.println(file.getAbsolutePath());
@@ -88,12 +95,12 @@ public class CryptoUtils {
         }
     }
     
-    public static void encryptObj(Serializable object, OutputStream ostream, Key key) throws IOException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException {
+    public static void encryptObj(Serializable object, OutputStream ostream) throws Exception {
 	    try {
 	    	Cipher cipher = Cipher.getInstance(TRANSFORMATION);
 	    	// Create cipher
 	        synchronized(cipher){
-                cipher.init(Cipher.ENCRYPT_MODE, key);
+                cipher.init(Cipher.ENCRYPT_MODE, chkKeyFile());
     	        SealedObject sealedObject = new SealedObject(object, cipher);
 
     	        // Wrap the output stream
@@ -108,10 +115,10 @@ public class CryptoUtils {
 	    }
 	}
 
-	public static Object decryptObj(InputStream istream,  Key key) throws IOException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException {
+	public static Object decryptObj(InputStream istream) throws Exception {
 		Cipher cipher = Cipher.getInstance(TRANSFORMATION);
 		synchronized(cipher){
-			cipher.init(Cipher.DECRYPT_MODE, key);
+			cipher.init(Cipher.DECRYPT_MODE, chkKeyFile());
 
 		    CipherInputStream cipherInputStream = new CipherInputStream(istream, cipher);
 		    ObjectInputStream inputStream = new ObjectInputStream(cipherInputStream);
@@ -126,7 +133,7 @@ public class CryptoUtils {
         }
 	}
     
-    public static void encrypt(Key key, InputStream in, OutputStream out)  throws Exception{
+    public static void encryptStream(Key key, InputStream in, OutputStream out)  throws Exception{
     	byte[] buf = new byte[1024];
     	Cipher cipher = Cipher.getInstance(TRANSFORMATION);
         cipher.init(Cipher.ENCRYPT_MODE, key);
@@ -140,7 +147,7 @@ public class CryptoUtils {
         out.close();
     }
 
-    public static void decrypt(Key sk, InputStream in, OutputStream out)  throws Exception{
+    public static void decryptStream(Key sk, InputStream in, OutputStream out)  throws Exception{
     	byte[] buf = new byte[1024];
     	Cipher cipher = Cipher.getInstance(TRANSFORMATION);
     	cipher.init(Cipher.ENCRYPT_MODE, sk);
@@ -152,4 +159,30 @@ public class CryptoUtils {
         }
 //        out.close();
       }
+    
+    public static KeyPair getKeyPair(String password) {
+	    try {   
+	    	ByteArrayInputStream bis = new ByteArrayInputStream(getSuperSeed(password));
+		    ObjectInput in = new ObjectInputStream(bis);
+		    SecureRandom sr = (SecureRandom)in.readObject(); 
+
+	        KeyPairGenerator keyGen = KeyPairGenerator.getInstance(CommonConst.RSA);
+	        keyGen.initialize(1024, sr);
+	        KeyPair keyPair = keyGen.generateKeyPair();
+	        return keyPair;
+	    } catch (Exception e) {
+	        System.out.println("Failed to generate key pair!");
+	    }
+	    return null;
+	}
+	
+	private static byte[] getSuperSeed(String password) throws IOException {
+		byte [] ret = null;
+		SecureRandom sr = new SecureRandom(password.getBytes());
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		ObjectOutput out = new ObjectOutputStream(bos);   
+		out.writeObject(sr);
+		ret = bos.toByteArray();
+		return ret;
+	}
 }

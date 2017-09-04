@@ -244,6 +244,86 @@ public class FileHandler {
     	return meta;
     }
     
+    private static MetaCraid splitBitOperation(String sSourcePath, ArrayList<Integer> sSplitRatio) {
+    	MetaCraid meta = null;
+    	ArrayList<String> splitFileNames = null;
+    	BufferedOutputStream bw = null;	
+		RandomAccessFile raf = null;
+		File sourceFile = null;
+		File encryptedFile = null;
+		String encryptedFilePath = null;
+		
+		try{
+//			encryptedFilePath = sSourcePath+CommonConst.CURRENT_DIR+CommonConst.ENCRYPTED;
+//			sourceFile = new File(sSourcePath);
+//			encryptedFile = new File(encryptedFilePath);
+//			splitFileNames = new ArrayList<String>();
+//			
+//			meta = new MetaCraid();
+//			meta.setOriginFileType(CommonConst.BINARY);
+//	    	meta.setOriginFilePath(sSourcePath);
+//	    	meta.setId(CommonUtil.makeUniqueTimeID());
+//	    	meta.setOperationType(CommonConst.ENCRYPT);
+//	    	meta.setSecretKey(CryptoUtils.generateRandomSecretKey(CommonConst.AES));
+//    		
+//	    	CryptoUtils.encrypt(meta.getSecretKey(), sourceFile, encryptedFile);
+    		raf = new RandomAccessFile(encryptedFilePath, "r");
+    		long sourceSize = raf.length();
+            sourceSize = raf.length();
+            getSplitRatio(sourceSize, sSplitRatio);
+            meta.setSplitRatio(sSplitRatio);
+            
+            int iSplitCnt = sSplitRatio.size();
+            int maxReadBufferSize = 8 * 1024;
+            long bytesPerSplit = 0 ;
+            String aTempFileName = null;
+            for(int destIx=0; destIx < (iSplitCnt-1); destIx++) {
+            	bytesPerSplit = sSplitRatio.get(destIx);
+            	aTempFileName = sSourcePath.substring(0,sSourcePath.lastIndexOf("\\")+1)+CommonUtil.makeUniqueID(24);
+     			bw = new BufferedOutputStream(new FileOutputStream(aTempFileName));
+     			
+     			if(bytesPerSplit > maxReadBufferSize) {
+                    long numReads = bytesPerSplit/maxReadBufferSize;
+                    long numRemainingRead = bytesPerSplit % maxReadBufferSize;
+                    for(int i=0; i<numReads; i++) {
+                        readWrite(raf, bw, maxReadBufferSize);
+                    }
+                    if(numRemainingRead > 0) {
+                        readWrite(raf, bw, numRemainingRead);
+                    }
+                }else {
+                    readWrite(raf, bw, bytesPerSplit);
+                }
+                bw.flush();
+                splitFileNames.add(aTempFileName);
+            }
+            
+            long remainingBytes = sourceSize - raf.getFilePointer();
+
+            if(remainingBytes > 0) {
+            	aTempFileName = sSourcePath.substring(0,sSourcePath.lastIndexOf("\\")+1)+CommonUtil.makeUniqueID(24);
+            	bw = new BufferedOutputStream(new FileOutputStream(aTempFileName));
+            	
+            	readWrite(raf, bw, remainingBytes);
+                bw.flush();
+                splitFileNames.add(aTempFileName);
+                sSplitRatio.set(sSplitRatio.size()-1, (int) remainingBytes);
+            }
+            meta.setSplitFileNames(splitFileNames);
+    	}catch(Exception e){
+    		e.printStackTrace();
+    	}finally {
+            try {
+                bw.close();
+                raf.close();
+//                encryptedFile.delete();
+            } catch (IOException ex) {
+            	ex.printStackTrace();
+            }
+        }
+    	return meta;
+    }
+    
     private static void getSplitRatio(long fileLength, ArrayList<Integer> sSplitRatio){
     	int totalLength = 0;
     	int itemCnt = sSplitRatio.size();
@@ -446,6 +526,9 @@ public class FileHandler {
     private static void readWrite(RandomAccessFile raf, OutputStream Os, long numBytes) throws IOException {
         byte[] buf = new byte[(int) numBytes];
         int val = raf.read(buf);
+        for(int i=0;i<numBytes;i++) {
+        	System.out.println(buf[i]);
+        }
         if(val != -1) {
         	Os.write(buf);
         }   	
@@ -602,7 +685,7 @@ public class FileHandler {
                 file.createNewFile(); 
             
             oos = new ObjectOutputStream(new FileOutputStream(sFilePath));
-            CryptoUtils.encryptObj((Serializable) obj, oos, CryptoUtils.chkKeyFile());
+            CryptoUtils.encryptObj((Serializable) obj, oos);
             
         }catch(Exception ex){
         	ex.printStackTrace();
@@ -626,7 +709,7 @@ public class FileHandler {
                 fileIn = new FileInputStream(sFileName);
                 ObjectInputStream ois = new ObjectInputStream(fileIn);
                 
-                oRet = CryptoUtils.decryptObj(ois, CryptoUtils.chkKeyFile());
+                oRet = CryptoUtils.decryptObj(ois);
                 
             }
         } catch (Exception ex) {

@@ -1,7 +1,5 @@
 package com.jay.util;
 
-import java.security.SecureRandom;
-
 public class CommonConst{
     public static final String CURRENT_DIR = ".";
     public static final String WHITE_SPACE = " ";
@@ -16,6 +14,7 @@ public class CommonConst{
     public static final String AES_CBC_PKCS5 = "AES/CBC/PKCS5Padding";
     public static final String DES = "DES";
     public static final String DESede = "DESede";
+    public static final String RSA = "RSA";
     public static final int ENCRYPT = 1;
     public static final int DECRYPT = 0;
     public static final int PLAIN = 3;
@@ -85,10 +84,9 @@ public class CommonConst{
 	public static final int PBE_KEY_TYPE = 2;
 	public static final int ENC_BYTE_32 = 256;
 	public static final int ENC_BYTE_64 = 512;
-	public static final String RSA_STRING = "RSA";
 	public static final String PROVIDER_BC = "BC";
 	public static final String RSA_NOPADDING_STR = "RSA/None/NoPadding";
 	public static final String PBKDF = "PBKDF2WithHmacSHA256";
 	public static final int ITERATION_CNT = 65536;
-	public static final int ENC_BYTE_16 = 128;
+	public static final int ENC_BYTE_16 = 128;	
 }

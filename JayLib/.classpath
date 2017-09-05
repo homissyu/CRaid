@@ -19,9 +19,9 @@
 	<classpathentry exported="true" kind="lib" path="lib/joda-time-2.8.1.jar"/>
 	<classpathentry kind="lib" path="lib/bcprov-jdk15on-157.jar"/>
 	<classpathentry kind="lib" path="lib/dropbox-core-sdk-1.8.2.jar"/>
-	<classpathentry kind="lib" path="lib/cloudrail-si-release.jar"/>
 	<classpathentry kind="lib" path="lib/commons-codec-1.10.jar"/>
 	<classpathentry kind="lib" path="lib/unirest-java-1.4.9.jar"/>
+	<classpathentry kind="lib" path="lib/pCloud.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jst.server.core.container/org.eclipse.jst.server.tomcat.runtimeTarget/Apache Tomcat v9.0">
 		<attributes>
 			<attribute name="owner.project.facets" value="jst.utility"/>

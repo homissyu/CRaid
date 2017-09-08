@@ -7,85 +7,182 @@ import javax.crypto.SecretKey;
 
 public class MetaCraid implements Serializable {
 	private static final long serialVersionUID = -2518143671167959230L;
-	public static final String SERIAL_ID = CommonUtil.makeUniqueID(16);
 	private String mId = null;
 	private ArrayList<Integer> mSplitRatio = new ArrayList<Integer>();
-//	private ArrayList<Integer> mSaltPos = new ArrayList<Integer>();
 	private String mOriginFilePath = null;
 	private ArrayList<String> mSplitFileNames = new ArrayList<String>();
 	private int mOriginFileType = CommonConst.ASCII;
-//	private ArrayList<ManipulationInfo> mManipulationInfo = new ArrayList<ManipulationInfo>();
-	private int mOperationType = CommonConst.ENCRYPT;
+	private boolean mOperationType = CommonConst.ENCRYPT;
 	private SecretKey mSecretKey = null; 
-//	private ArrayList<Integer> mSplitRatio = new ArrayList<Integer>();
+	private String mParityFileName = null;
+	private byte[] mRemainingBytes = null;
+	private boolean mRaidType = false;
 	
-	public MetaCraid() {
+	/**
+	 * 
+	 * @return boolean
+	 */
+	public synchronized final boolean isRaidType() {
+		return mRaidType;
 	}
-		
+
+	/**
+	 * 
+	 * @param mRaidType
+	 */
+	public synchronized final void setRaidType(boolean mRaidType) {
+		this.mRaidType = mRaidType;
+	}
+	
+	/**
+	 * 
+	 * @return byte[]
+	 */
+	public synchronized final byte[] getRemainingBytes() {
+		return mRemainingBytes;
+	}
+
+	/**
+	 * 
+	 * @param mRemainingBytes
+	 */
+	public synchronized final void setRemainingBytes(byte[] mRemainingBytes) {
+		this.mRemainingBytes = mRemainingBytes;
+	}
+	
+	/**
+	 * 	
+	 * @return SecretKey
+	 */
 	public synchronized final SecretKey getSecretKey() {
 		return mSecretKey;
 	}
+
+	/**
+	 * 
+	 * @param sk
+	 */
 	public synchronized final void setSecretKey(SecretKey sk) {
 		this.mSecretKey = sk;
 	}
-	public synchronized final int getOperationType() {
+	
+	/**
+	 * 
+	 * @return boolean
+	 */
+	public synchronized final boolean getOperationType() {
 		return mOperationType;
 	}
-	public synchronized final void setOperationType(int mOperationType) {
+	
+	/**
+	 * 
+	 * @param mOperationType
+	 */
+	public synchronized final void setOperationType(boolean mOperationType) {
 		this.mOperationType = mOperationType;
 	}
-//	public synchronized final ArrayList<ManipulationInfo> getManipulationInfo() {
-//		return mManipulationInfo;
-//	}
-//	public synchronized final void setManipulationInfo(ArrayList<ManipulationInfo> manipulationInfo) {
-//		this.mManipulationInfo = manipulationInfo;
-//	}
+	
+	/**
+	 * 
+	 * @return String
+	 */
 	public synchronized final String getId() {
 		return mId;
 	}
+	
+	/**
+	 * 
+	 * @param mId
+	 */
 	public synchronized final void setId(String mId) {
 		this.mId = mId;
 	}
+	
+	/**
+	 * 
+	 * @return ArrayList<Integer>
+	 */
 	public synchronized final ArrayList<Integer> getSplitRatio() {
 		return mSplitRatio;
 	}
+	
+	/**
+	 * 
+	 * @param mSplitRatio
+	 */
 	public synchronized final void setSplitRatio(ArrayList<Integer> mSplitRatio) {
 		this.mSplitRatio = mSplitRatio;
 	}
-//	public synchronized final ArrayList<Integer> getSaltPos() {
-//		return mSaltPos;
-//	}
-//	public synchronized final void setSaltPos(ArrayList<Integer> mSaltPos) {
-//		this.mSaltPos = mSaltPos;
-//	}
+	
+	/**
+	 * 
+	 * @return String
+	 */
 	public synchronized final String getOriginFilePath() {
 		return mOriginFilePath;
 	}
+	
+	/**
+	 * 
+	 * @param mOriginFilePath
+	 */
 	public synchronized final void setOriginFilePath(String mOriginFilePath) {
 		this.mOriginFilePath = mOriginFilePath;
 	}
+	
+	/**
+	 * 
+	 * @return ArrayList<String>
+	 */
 	public synchronized final ArrayList<String> getSplitFileNames() {
 		return mSplitFileNames;
 	}
+	
+	/**
+	 * 
+	 * @param mSplitFileNames
+	 */
 	public synchronized final void setSplitFileNames(ArrayList<String> mSplitFileNames) {
 		this.mSplitFileNames = mSplitFileNames;
 	}
+	
+	/**
+	 * 
+	 * @return int
+	 */
 	public synchronized final int getOriginFileType() {
 		return mOriginFileType;
 	}
+	
+	/**
+	 * 
+	 * @param mOriginFileType
+	 */
 	public synchronized final void setOriginFileType(int mOriginFileType) {
 		this.mOriginFileType = mOriginFileType;
 	}
-//	public synchronized final String getmOriginFileName() {
-//		return mOriginFileName;
-//	}
-//	public synchronized final void setmOriginFileName(String mOriginFileName) {
-//		this.mOriginFileName = mOriginFileName;
-//	}
 	
+	/**
+	 * 
+	 * @return String
+	 */
+	public String getParityFileName() {
+		return mParityFileName;
+	}
+	
+	/**
+	 * 
+	 * @param mParityFileName
+	 */
+	public void setParityFileName(String mParityFileName) {
+		this.mParityFileName = mParityFileName;
+	}
+	
+	/**
+	 * @return String
+	 */
 	public String toString() {
 		StringBuffer retBuf = new StringBuffer();
-		
 		retBuf.append(CommonConst.ID);
 		retBuf.append("=");
 		retBuf.append(this.getId());
@@ -106,10 +203,25 @@ public class MetaCraid implements Serializable {
 		retBuf.append("=");
 		retBuf.append(this.getSplitRatio());
 		retBuf.append(System.lineSeparator());
+		retBuf.append(CommonConst.ENCRYPTED);
+		retBuf.append("=");
+		retBuf.append(this.getOperationType());
+		retBuf.append(System.lineSeparator());
 		retBuf.append(CommonConst.SYMMETRIC_KEY_STR);
 		retBuf.append("=");
 		retBuf.append(this.getSecretKey());
-		
+		retBuf.append(System.lineSeparator());
+		retBuf.append(CommonConst.IS_RAID);
+		retBuf.append("=");
+		retBuf.append(this.isRaidType());
+		retBuf.append(System.lineSeparator());
+		retBuf.append(CommonConst.PARITY_FILE_NAME);
+		retBuf.append("=");
+		retBuf.append(this.getParityFileName());
+		retBuf.append(System.lineSeparator());
+		retBuf.append(CommonConst.REMAINING_BYTES_LENGTH);
+		retBuf.append("=");
+		retBuf.append(this.getRemainingBytes().length);
 		return retBuf.toString();
 	}
 }

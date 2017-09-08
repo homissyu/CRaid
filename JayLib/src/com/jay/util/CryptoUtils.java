@@ -13,20 +13,16 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
-import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
 import javax.crypto.CipherOutputStream;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SealedObject;
 import javax.crypto.SecretKey;
 
@@ -40,16 +36,36 @@ import org.bouncycastle.crypto.CryptoException;
 public class CryptoUtils {
     private static final String TRANSFORMATION = CommonConst.AES;
  
+    /**
+     * 
+     * @param key
+     * @param inputFile
+     * @param outputFile
+     * @throws CryptoException
+     */
     public static void encrypt(Key key, File inputFile, File outputFile)
             throws CryptoException {
         doCrypto(Cipher.ENCRYPT_MODE, key, inputFile, outputFile);
     }
  
+    /**
+     * 
+     * @param key
+     * @param inputFile
+     * @param outputFile
+     * @throws CryptoException
+     */
     public static void decrypt(Key key, File inputFile, File outputFile)
             throws CryptoException {
         doCrypto(Cipher.DECRYPT_MODE, key, inputFile, outputFile);
     }
     
+    /**
+     * 
+     * @param algorithm
+     * @return SecretKey
+     * @throws Exception
+     */
     public static SecretKey generateRandomSecretKey(String algorithm) throws Exception{
         KeyGenerator keyGen=KeyGenerator.getInstance(algorithm);
         keyGen.init(128);
@@ -57,12 +73,17 @@ public class CryptoUtils {
         return key;
     }
     
+    /**
+     * 
+     * @return Key
+     * @throws Exception
+     */
     private static Key chkKeyFile() throws Exception{
     	SecretKey aKey = null;
         File file = new File(System.getProperty(CommonConst.USER_DIR_PROP_KEY)+File.separator+CommonConst.LIB_DIR+File.separator+CommonConst.SECRET_KEY_FILE);
-        System.out.println(file.getAbsolutePath());
+//System.out.println(file.getAbsolutePath());
         if(!file.exists()){
-        	System.out.println(file.exists());
+//System.out.println(file.exists());
         	aKey = generateRandomSecretKey(CommonConst.AES);
             FileHandler.writeSerFile( aKey, System.getProperty(CommonConst.USER_DIR_PROP_KEY)+File.separator+CommonConst.LIB_DIR, CommonConst.SECRET_KEY_FILE);
         }else aKey = (SecretKey) FileHandler.readSerFile(System.getProperty(CommonConst.USER_DIR_PROP_KEY)+File.separator+CommonConst.LIB_DIR+File.separator+CommonConst.SECRET_KEY_FILE);
@@ -70,8 +91,14 @@ public class CryptoUtils {
         return aKey;
     }
  
-    private static void doCrypto(int cipherMode, Key sk, File inputFile,
-            File outputFile) throws CryptoException {
+    /**
+     * 
+     * @param cipherMode
+     * @param sk
+     * @param inputFile
+     * @param outputFile
+     */
+    private static void doCrypto(int cipherMode, Key sk, File inputFile,File outputFile) {
         try {
             Cipher cipher = Cipher.getInstance(TRANSFORMATION);
             cipher.init(cipherMode, sk);
@@ -79,7 +106,7 @@ public class CryptoUtils {
             FileInputStream inputStream = new FileInputStream(inputFile);
             byte[] inputBytes = new byte[(int) inputFile.length()];
             inputStream.read(inputBytes);
-             
+// System.out.println(inputFile.getName());      
             byte[] outputBytes = cipher.doFinal(inputBytes);
              
             FileOutputStream outputStream = new FileOutputStream(outputFile);
@@ -88,13 +115,17 @@ public class CryptoUtils {
             inputStream.close();
             outputStream.close();
              
-        } catch (NoSuchPaddingException | NoSuchAlgorithmException
-                | InvalidKeyException | BadPaddingException
-                | IllegalBlockSizeException | IOException ex) {
-            throw new CryptoException("Error encrypting/decrypting file", ex);
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
     
+    /**
+     * 
+     * @param object
+     * @param ostream
+     * @throws Exception
+     */
     public static void encryptObj(Serializable object, OutputStream ostream) throws Exception {
 	    try {
 	    	Cipher cipher = Cipher.getInstance(TRANSFORMATION);
@@ -114,7 +145,13 @@ public class CryptoUtils {
 	        e.printStackTrace();
 	    }
 	}
-
+    
+    /**
+     * 
+     * @param istream
+     * @return Object
+     * @throws Exception
+     */
 	public static Object decryptObj(InputStream istream) throws Exception {
 		Cipher cipher = Cipher.getInstance(TRANSFORMATION);
 		synchronized(cipher){
@@ -133,6 +170,13 @@ public class CryptoUtils {
         }
 	}
     
+	/**
+	 * 
+	 * @param key
+	 * @param in
+	 * @param out
+	 * @throws Exception
+	 */
     public static void encryptStream(Key key, InputStream in, OutputStream out)  throws Exception{
     	byte[] buf = new byte[1024];
     	Cipher cipher = Cipher.getInstance(TRANSFORMATION);
@@ -147,6 +191,13 @@ public class CryptoUtils {
         out.close();
     }
 
+    /**
+     * 
+     * @param sk
+     * @param in
+     * @param out
+     * @throws Exception
+     */
     public static void decryptStream(Key sk, InputStream in, OutputStream out)  throws Exception{
     	byte[] buf = new byte[1024];
     	Cipher cipher = Cipher.getInstance(TRANSFORMATION);
@@ -160,6 +211,11 @@ public class CryptoUtils {
 //        out.close();
       }
     
+    /**
+     * 
+     * @param password
+     * @return KeyPair
+     */
     public static KeyPair getKeyPair(String password) {
 	    try {   
 	    	ByteArrayInputStream bis = new ByteArrayInputStream(getSuperSeed(password));
@@ -172,10 +228,17 @@ public class CryptoUtils {
 	        return keyPair;
 	    } catch (Exception e) {
 	        System.out.println("Failed to generate key pair!");
+	        e.printStackTrace();
 	    }
 	    return null;
 	}
 	
+    /**
+     * 
+     * @param password
+     * @return byte[]
+     * @throws IOException
+     */
 	private static byte[] getSuperSeed(String password) throws IOException {
 		byte [] ret = null;
 		SecureRandom sr = new SecureRandom(password.getBytes());

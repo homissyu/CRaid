@@ -15,6 +15,13 @@ import com.jay.util.FileHandler;
 
 public class CRaid {
 
+	/**
+	 * 
+	 * @param sSourceFilePath
+	 * @param aSplitRatio
+	 * @param doEncrypt
+	 * @param doRaid
+	 */
 	public void splitFile(String sSourceFilePath, ArrayList<Integer> aSplitRatio, boolean doEncrypt, boolean doRaid) {
 		// TODO Auto-generated method stub
 		try {
@@ -30,6 +37,11 @@ public class CRaid {
 		}
 	}
 
+	/**
+	 * 
+	 * @param sMetaFilePath
+	 * @param sTargetFilePath
+	 */
 	public void mergeFile(String sMetaFilePath, String sTargetFilePath) {
 		// TODO Auto-generated method stub
 		try {

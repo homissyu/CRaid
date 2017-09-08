@@ -7,9 +7,9 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import com.jay.craid.MetaCraid;
 import com.jay.util.CommonUtil;
 import com.jay.util.FileHandler;
-import com.jay.util.MetaCraid;
 
 public class RaidController {
 	

@@ -1,9 +1,11 @@
-package com.jay.util;
+package com.jay.craid;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 
 import javax.crypto.SecretKey;
+
+import com.jay.util.CommonConst;
 
 public class MetaCraid implements Serializable {
 	private static final long serialVersionUID = -2518143671167959230L;

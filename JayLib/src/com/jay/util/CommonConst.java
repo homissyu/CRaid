@@ -1,6 +1,7 @@
 package com.jay.util;
 
 public class CommonConst{
+	public static final String CRAID = "CRAID";
     public static final String CURRENT_DIR = ".";
     public static final String WHITE_SPACE = " ";
     public static final String ENTRY_STR="entry";
@@ -99,4 +100,11 @@ public class CommonConst{
 	public static final String PARITY_FILE_NAME = "PARITY_FILE_NAME";
 	public static final String REMAINING_BYTES_LENGTH = "REMAINING_BYTES_LENGTH";
 	public static final String IS_RAID = "IS_RAID";
+	public static final String LOG_TYPE_SIZE = "SIZE";
+	public static final String LOG_FILE_NAME = "CRaid.log";
+	public static final int OPERATION_MODE = 0;
+	public static final int TEST_MODE = 1;
+	public static final int QA_MODE = 2;
+	public static final int DEBUG_MODE = 3;
+	public static final int DEVELOPING_MODE = 4;
 }

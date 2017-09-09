@@ -11,10 +11,15 @@ import com.jay.raid.RaidController;
 import com.jay.util.CommonConst;
 import com.jay.util.CommonUtil;
 import com.jay.util.CryptoUtils;
+import com.jay.util.Debug;
 import com.jay.util.FileHandler;
 
 public class CRaid {
-
+	String mSubSystem = (this.getClass()).getCanonicalName();
+	public CRaid() {
+		Debug.addSubsystems(mSubSystem);
+	}
+	
 	/**
 	 * 
 	 * @param sSourceFilePath
@@ -26,13 +31,12 @@ public class CRaid {
 		// TODO Auto-generated method stub
 		try {
     			MetaCraid meta = splitOperation(sSourceFilePath, aSplitRatio, doEncrypt, doRaid);
-//    			System.out.println("sSourceFilePath:"+sSourceFilePath);
+    			Debug.trace(mSubSystem, CommonConst.DEBUG_MODE, meta.toString());
 	    		if(doRaid) {
 		    		if(RaidController.backup(sSourceFilePath, meta))
 		    			FileHandler.writeSerEncFile(meta, sMetaFilePath);
 		    		else throw new Exception("Failed RAID");
 	    		}else FileHandler.writeSerEncFile(meta, sMetaFilePath);
-//    	System.out.println(meta);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -49,6 +53,7 @@ public class CRaid {
     			MetaCraid meta = (MetaCraid)FileHandler.readSerEncFile(sMetaFilePath);
 //    System.out.println("sTargetFilePath:"+sTargetFilePath);
 //    System.out.println(meta);
+//    			Debug.trace(mSubSystem, CommonConst.DEVELOPING_MODE, meta.toString());
 	    		if(meta.isRaidType()) {
 		    		if(RaidController.recover(sTargetFilePath, meta))
 		    			mergeOperation(meta, sTargetFilePath, meta.getOperationType());
@@ -97,19 +102,18 @@ public class CRaid {
             sourceSize = raf.length();
             calcSplitRatio(sourceSize, sSplitRatio, doRaid);
             meta.setSplitRatio(sSplitRatio);
-//System.out.println("sSplitRatio:"+sSplitRatio);            
+            Debug.trace(mSubSystem, CommonConst.DEVELOPING_MODE, "sSplitRatio:"+sSplitRatio);
             int iSplitCnt = sSplitRatio.size();
             int maxReadBufferSize = (int) sourceSize;
             if (maxReadBufferSize  > 1024*8) maxReadBufferSize = 1024*8;
-//System.out.println("iSplitCnt:"+iSplitCnt);			
-//System.out.println("maxReadBufferSize:"+maxReadBufferSize);
+            Debug.trace(mSubSystem, CommonConst.DEVELOPING_MODE, "iSplitCnt:"+iSplitCnt);
+            Debug.trace(mSubSystem, CommonConst.DEVELOPING_MODE, "maxReadBufferSize:"+maxReadBufferSize);
 
             long bytesPerSplit = 0 ;
             String aTempFileName = null;
             for(int destIx=0; destIx < iSplitCnt; destIx++) {
 	            	bytesPerSplit = sSplitRatio.get(destIx);
-	//System.out.println(destIx+":bytesPerSplit:"+bytesPerSplit);
-	            	      	
+	            	Debug.trace(mSubSystem, CommonConst.DEVELOPING_MODE, destIx+":bytesPerSplit:"+bytesPerSplit);
 	            	aTempFileName = sSourcePath.substring(0,sSourcePath.lastIndexOf(File.separator)+1)+CommonUtil.makeUniqueID(24);
 	            	File aTempFile = new File(aTempFileName);
 	            	if(!aTempFile.exists()) aTempFile.createNewFile();
@@ -117,9 +121,10 @@ public class CRaid {
 	 			
 	 			if(bytesPerSplit > maxReadBufferSize) {
 	                long numReads = bytesPerSplit/maxReadBufferSize;
-	//System.out.println(destIx+":numReads:"+numReads);                    
+	                Debug.trace(mSubSystem, CommonConst.DEVELOPING_MODE, destIx+":numReads:"+numReads);
 	                long numRemainingRead = bytesPerSplit % maxReadBufferSize;
-	//System.out.println(destIx+":numRemainingRead:"+numRemainingRead);
+	                Debug.trace(mSubSystem, CommonConst.DEVELOPING_MODE, destIx+":numRemainingRead:"+numRemainingRead);
+
 	                for(int i=0; i<numReads; i++) {
 	                    FileHandler.readWrite(raf, bw, maxReadBufferSize);
 	                }
@@ -134,7 +139,8 @@ public class CRaid {
             }
             
             long remainingBytes = sourceSize - raf.getFilePointer();
-//System.out.println("Last:remainingBytes:"+remainingBytes);
+            Debug.trace(mSubSystem, CommonConst.DEVELOPING_MODE, "Last:remainingBytes:"+remainingBytes);
+
             if(remainingBytes > 0) {
 //            	aTempFileName = sSourcePath.substring(0,sSourcePath.lastIndexOf(File.separator)+1)+CommonUtil.makeUniqueID(24);
 //            	bw = new BufferedOutputStream(new FileOutputStream(aTempFileName));

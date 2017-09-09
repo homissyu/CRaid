@@ -43,6 +43,12 @@ public class MetaCraid implements Serializable {
 	public synchronized final byte[] getRemainingBytes() {
 		return mRemainingBytes;
 	}
+	
+	private long getRemainingBytesLenght() {
+		long ret = 0;
+		if(this.mRemainingBytes != null) ret = this.mRemainingBytes.length;
+		return ret;
+	}
 
 	/**
 	 * 
@@ -223,7 +229,7 @@ public class MetaCraid implements Serializable {
 		retBuf.append(System.lineSeparator());
 		retBuf.append(CommonConst.REMAINING_BYTES_LENGTH);
 		retBuf.append("=");
-		retBuf.append(this.getRemainingBytes().length);
+		retBuf.append(this.getRemainingBytesLenght());
 		return retBuf.toString();
 	}
 }

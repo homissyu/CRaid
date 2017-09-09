@@ -199,7 +199,7 @@ public class FileHandler {
      * @throws JayException
      */
     public static void writeSerEncFile(Object obj, String sFilePath){
-        ObjectOutputStream oos = null;
+    	    ObjectOutputStream oos = null;
         File file = null;
         try{
 //        		file = new File(sFilePath);

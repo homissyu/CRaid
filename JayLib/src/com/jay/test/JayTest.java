@@ -2,9 +2,12 @@ package com.jay.test;
 
 import java.util.ArrayList;
 
+import org.apache.commons.logging.impl.SimpleLog;
+
 import com.jay.craid.CRaid;
 import com.jay.util.CommonConst;
 import com.jay.util.CommonUtil;
+import com.jay.util.Debug;
 
 public class JayTest {
 	
@@ -15,9 +18,14 @@ public class JayTest {
 		String sSourceFilePath = sSourcePath + sSourceFileName;
 		String sTargetFilePath = sSourcePath+CommonConst.MERGE_STR+sSourceFileName;
 		String sMetaFilePath = sSourcePath+CommonConst.META_FILE_NAME;
-		
+		String sLogFilePath = sSourcePath+CommonConst.LOG_FILE_NAME;
+		String mSubSystem = "com.jay.test.JayTest";
 		try {
 			CRaid craid = new CRaid();
+			
+			Debug.setVerbosity(CommonConst.DEBUG_MODE);
+			Debug.setErrLog(sLogFilePath);
+			Debug.addSubsystems(mSubSystem);
 			
 			ArrayList<Integer> aSplitRatio = new ArrayList<Integer>();
 //			for(int i=0;i<CommonConst.CSP_FREE_AMOUNT.length;i++) {
@@ -27,13 +35,17 @@ public class JayTest {
 			aSplitRatio.add(10);
 			aSplitRatio.add(10);
 			aSplitRatio.add(10);
-			
+
+			Debug.trace(mSubSystem, 0, "Start Split");
 			System.out.println("Start Split : "+CommonUtil.getCurrentTime(CommonConst.DATETIME_FORMAT));
 			craid.splitFile(sSourceFilePath, aSplitRatio, CommonConst.ENCRYPT, CommonConst.DO_RAID, sMetaFilePath);
+			Debug.trace(mSubSystem, 0, "End Split");
 			System.out.println("End Split : "+CommonUtil.getCurrentTime(CommonConst.DATETIME_FORMAT)+System.lineSeparator());
 
+			Debug.trace(mSubSystem, 0, "Start Merge");
 			System.out.println("Start Merge : "+CommonUtil.getCurrentTime(CommonConst.DATETIME_FORMAT));
 			craid.mergeFile(sTargetFilePath, sMetaFilePath);
+			Debug.trace(mSubSystem, 0, "End Merge");
 			System.out.println("End Merge : "+CommonUtil.getCurrentTime(CommonConst.DATETIME_FORMAT));
 			
 //			AWSService AWS = new AWSService();

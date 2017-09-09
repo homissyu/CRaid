@@ -42,10 +42,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
-import java.util.Vector;
 
 public class Debug {
     public static final String SOURCE_ID = "$Id: Debug.java,v v 1.0 2003/10/17 20:57:00 Jonathan Exp $";
@@ -65,7 +65,7 @@ public class Debug {
     private static int mNumWrites = NUMWRITESFORTRUNC;
 
     private static boolean mInitialized = false;
-    private static Vector<String> mSubSystems = new Vector<String>(5);
+    private static ArrayList<String> mSubSystems = new ArrayList<String>();
     private static int mVerbosity = 1;
 
     // write to mLogFile to get text into the log file.
@@ -98,7 +98,8 @@ public class Debug {
                 "# This is the logfile of the Maxigent logging facility.\n";
 
     private static boolean mBatchMode = false;
-
+    
+    
     // Constructor, read environment variable and set data members
     //--------------------------------------------------
     public Debug(String sSubSystem, int iVerbosity, String sDebugType) throws Exception {
@@ -112,7 +113,7 @@ public class Debug {
         mVerbosity = iVerbosity;
 
         String tmp = sDebugType;
-        if ( tmp.equals("SIZE") ) {
+        if ( tmp.equals(CommonConst.LOG_TYPE_SIZE) ) {
             mIsMakingBySize = true;
         } else {
             mIsMakingBySize = false;
@@ -128,6 +129,10 @@ public class Debug {
 
         mInitialized = true;
     }    
+    
+    public static void setStdOut() {;
+    		mStdOut = new PrintWriter(System.out, true);
+    }
 
     //--------------------------------------------------
     public static int getVerbosity() {
@@ -146,10 +151,10 @@ public class Debug {
         if (! aSubsystems.equals("ALL")) {
             StringTokenizer strkr = new StringTokenizer(aSubsystems, ":");
             while(strkr.hasMoreTokens()) {
-                mSubSystems.addElement(strkr.nextToken());
+                mSubSystems.add(strkr.nextToken());
             }
         } else {
-            mSubSystems.addElement(aSubsystems);
+            mSubSystems.add(aSubsystems);
         }
     }
 
@@ -182,22 +187,22 @@ public class Debug {
                 }
 //                mLogFileName = aLogFileName;
 //                mLogFilePath = logPath + File.separator + aLogFileName;
-                mLogFilePath = logPath + File.separator + mLogFileName;
-                mLogFileFile = new File(mLogFilePath);
-                FileOutputStream fos = new FileOutputStream(mLogFilePath, true);
+//                mLogFilePath = logPath + File.separator + mLogFileName;
+                mLogFileFile = new File(mLogFileName);
+                FileOutputStream fos = new FileOutputStream(mLogFileName, true);
                 mLogFile = new PrintWriter(fos, true);
                 if (isNew) {
                     logfilePrint("\n\n\n" +
                                mDateFormat.format(new Date()).toString() +
-                               ": *** BEGIN LOGFILE: " + mLogFilePath, true);
+                               ": *** BEGIN LOGFILE: " + mLogFileName, true);
                 } else {
                     logfilePrint("\n\n\n" +
                                mDateFormat.format(new Date()).toString() +
-                               ": *** CONTINUING LOGFILE: " + mLogFilePath, true);
+                               ": *** CONTINUING LOGFILE: " + mLogFileName, true);
                 }
             }
         } catch (IOException e) {
-            throwException(e, "Unable to set logfile to " + mLogFilePath);
+            throwException(e, "Unable to set logfile to " + mLogFileName);
         }
     }
 
@@ -317,7 +322,7 @@ public class Debug {
     // Print something to standard output if it is enabled
     //--------------------------------------------------
     private static void stdoutPrint(String s, boolean nl) {
-        if (mStdOut != null && mStdOutPrintEnabled) {
+    		if (mStdOut != null && mStdOutPrintEnabled) {
             synchronized(mStdOut) {
                 if (nl)
                     mStdOut.println(s);

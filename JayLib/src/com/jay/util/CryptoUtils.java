@@ -81,7 +81,7 @@ public class CryptoUtils {
     private static Key chkKeyFile() throws Exception{
     		SecretKey aKey = null;
         File file = new File(System.getProperty(CommonConst.USER_DIR_PROP_KEY)+File.separator+CommonConst.LIB_DIR+File.separator+CommonConst.SECRET_KEY_FILE);
-System.out.println(file.getAbsolutePath());
+//System.out.println(file.getAbsolutePath());
         if(!file.exists()){
 //System.out.println(file.exists());
         		aKey = generateRandomSecretKey(CommonConst.AES);

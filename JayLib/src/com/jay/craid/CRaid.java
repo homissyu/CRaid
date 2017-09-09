@@ -31,13 +31,13 @@ public class CRaid {
 		// TODO Auto-generated method stub
 		try {
     			MetaCraid meta = splitOperation(sSourceFilePath, aSplitRatio, doEncrypt, doRaid);
-    			Debug.trace(mSubSystem, CommonConst.DEBUG_MODE, meta.toString());
-	    		if(doRaid) {
+    			if(doRaid) {
 		    		if(RaidController.backup(sSourceFilePath, meta))
 		    			FileHandler.writeSerEncFile(meta, sMetaFilePath);
 		    		else throw new Exception("Failed RAID");
 	    		}else FileHandler.writeSerEncFile(meta, sMetaFilePath);
-		} catch (Exception e) {
+    			Debug.trace(mSubSystem, CommonConst.DEBUG_MODE, meta.toString());
+	    } catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

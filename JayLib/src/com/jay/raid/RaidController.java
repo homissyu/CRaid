@@ -8,12 +8,19 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import com.jay.craid.MetaCraid;
+import com.jay.util.CommonConst;
 import com.jay.util.CommonUtil;
+import com.jay.util.Debug;
 import com.jay.util.FileHandler;
 
 public class RaidController {
 	
 	private static ArrayList <byte[]> splitBufList = new ArrayList<byte[]>();
+	
+	static String mSubSystem = "com.jay.raid.RaidController";
+	public RaidController() {
+		Debug.addSubsystems(mSubSystem);
+	}
 	
 	/**
 	 * 

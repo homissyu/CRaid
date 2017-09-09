@@ -63,7 +63,7 @@ public class FileHandler {
 //        	System.out.println((char)(buf[i]));
 //        }
         if(val != -1) {
-        	Os.write(buf);
+        		Os.write(buf);
         }   	
     }
     
@@ -76,7 +76,7 @@ public class FileHandler {
         byte[] buf = new byte[(int)raf.length()];
         int val = raf.read(buf);
         if(val != -1) {
-        	Os.write(buf);
+        		Os.write(buf);
         }   	
     }
     
@@ -108,7 +108,7 @@ public class FileHandler {
             fos.close();
 // System.out.println(file.exists());
         }catch(Exception ex){
-        	ex.printStackTrace();
+        		ex.printStackTrace();
         }
     }
     
@@ -130,7 +130,7 @@ public class FileHandler {
 
             fos.close();
         }catch(Exception ex){
-        	ex.printStackTrace();
+        		ex.printStackTrace();
         }
     }
     
@@ -157,7 +157,7 @@ public class FileHandler {
             oos.writeObject(obj);
             oos.close();
         }catch(Exception ex){
-        	ex.printStackTrace();
+        		ex.printStackTrace();
         }
     }
     
@@ -180,12 +180,12 @@ public class FileHandler {
                 oRet = ois.readObject();
             }
         } catch (Exception ex) {
-        	ex.printStackTrace();
+        		ex.printStackTrace();
         } finally {
             try {
                 if(fileIn!=null)fileIn.close();
             } catch (IOException ex) {
-            	ex.printStackTrace();
+            		ex.printStackTrace();
             }
         }
         return oRet;
@@ -198,23 +198,19 @@ public class FileHandler {
      * @param sPath
      * @throws JayException
      */
-    public static void writeSerEncFile(Object obj, String sPath, String sFileName){
+    public static void writeSerEncFile(Object obj, String sFilePath){
         ObjectOutputStream oos = null;
         File file = null;
-        String sFilePath = sPath + File.separator + sFileName;
         try{
-        	file = new File(sPath);
-            if(!file.exists())
-                file.mkdirs();
-            file = new File(sFilePath);
-            if(!file.exists())
-                file.createNewFile(); 
+//        		file = new File(sFilePath);
+//        		if(!file.exists()) file.mkdirs();
+        		file = new File(sFilePath);
+            if(!file.exists()) file.createNewFile(); 
 // System.out.println(sFilePath);   
             oos = new ObjectOutputStream(new FileOutputStream(sFilePath));
             CryptoUtils.encryptObj((Serializable) obj, oos);
-            
         }catch(Exception ex){
-        	ex.printStackTrace();
+        		ex.printStackTrace();
         }
     }
     
@@ -238,12 +234,12 @@ public class FileHandler {
                 
             }
         } catch (Exception ex) {
-        	ex.printStackTrace();
+        		ex.printStackTrace();
         } finally {
             try {
                 if(fileIn!=null)fileIn.close();
             } catch (IOException ex) {
-            	ex.printStackTrace();
+            		ex.printStackTrace();
             }
         }
         return oRet;
@@ -259,33 +255,33 @@ public class FileHandler {
         FileReader inputStream = null;
         try {
             inputStream = new FileReader(filename);
-        	int c;
+            int c;
             while ((c = inputStream.read()) != -1) {
                 Character.UnicodeBlock block = Character.UnicodeBlock.of(c);
                 if (block == Character.UnicodeBlock.BASIC_LATIN || block == Character.UnicodeBlock.GREEK) {
 //                         (9)Horizontal Tab (10)Line feed  (11)Vertical tab (13)Carriage return (32)Space (126)tilde
                     if (c==9 || c == 10 || c == 11 || c == 13 || (c >= 32 && c <= 126)) {
-                    	bResult = true;
+                    		bResult = true;
 //                                (153)Superscript two (160)ϊ  (255) No break space                     
                     } else if (c == 153 || c >= 160 && c <= 255) {
-                    	bResult = true;
+                    		bResult = true;
 //                                (884)ʹ (885)͵ (890)ͺ (894); (900)' (974)ώ     
                     } else if (c == 884 || c == 885 || c == 890 || c == 894 || c >= 900 && c <= 1019) {
-                    	bResult = true;
+                    		bResult = true;
                     } else {                        
-                    	bResult = false;
-                    break;
+                    		bResult = false;
+                    		break;
                     }
                 }                
             }
         } catch (Exception ex) {
-        	ex.printStackTrace();
+        		ex.printStackTrace();
         } finally {
             if (inputStream != null) {
                 try {
                     inputStream.close();
                 } catch (IOException ex) {
-                	ex.printStackTrace();
+                		ex.printStackTrace();
                 }
             }
         }

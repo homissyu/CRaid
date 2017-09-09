@@ -1,6 +1,5 @@
 package com.jay.test;
 
-import java.io.File;
 import java.util.ArrayList;
 
 import com.jay.craid.CRaid;
@@ -11,11 +10,11 @@ public class JayTest {
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		String sSourcePath = "c:\\CRaid\\";
-		String sSourceFileName = "Arare_windows_0_9_2.exe";
+		String sSourcePath = "/Users/karl/CRaid/";
+		String sSourceFileName = "astx.dmg";
 		String sSourceFilePath = sSourcePath + sSourceFileName;
 		String sTargetFilePath = sSourcePath+CommonConst.MERGE_STR+sSourceFileName;
-		String sMetaFilePath = CommonConst.META_FILE_PATH+File.separator+CommonConst.META_FILE_NAME;
+		String sMetaFilePath = sSourcePath+CommonConst.META_FILE_NAME;
 		
 		try {
 			CRaid craid = new CRaid();
@@ -29,12 +28,12 @@ public class JayTest {
 			aSplitRatio.add(10);
 			aSplitRatio.add(10);
 			
-//			System.out.println("Start Split : "+CommonUtil.getCurrentTime(CommonConst.DATETIME_FORMAT));
-//			craid.splitFile(sSourceFilePath, aSplitRatio, CommonConst.ENCRYPT, CommonConst.DO_RAID);
-//			System.out.println("End Split : "+CommonUtil.getCurrentTime(CommonConst.DATETIME_FORMAT)+System.lineSeparator());
+			System.out.println("Start Split : "+CommonUtil.getCurrentTime(CommonConst.DATETIME_FORMAT));
+			craid.splitFile(sSourceFilePath, aSplitRatio, CommonConst.ENCRYPT, CommonConst.DO_RAID, sMetaFilePath);
+			System.out.println("End Split : "+CommonUtil.getCurrentTime(CommonConst.DATETIME_FORMAT)+System.lineSeparator());
 
 			System.out.println("Start Merge : "+CommonUtil.getCurrentTime(CommonConst.DATETIME_FORMAT));
-			craid.mergeFile(sMetaFilePath, sTargetFilePath);
+			craid.mergeFile(sTargetFilePath, sMetaFilePath);
 			System.out.println("End Merge : "+CommonUtil.getCurrentTime(CommonConst.DATETIME_FORMAT));
 			
 //			AWSService AWS = new AWSService();

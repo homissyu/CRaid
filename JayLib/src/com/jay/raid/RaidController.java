@@ -58,7 +58,7 @@ public class RaidController {
 		try {
 			meta.setParityFileName(CommonUtil.makeUniqueID(24));
 			doRaid(meta.getSplitFileNames());
-			FileHandler.writeFile(meta.getParityFileName(), splitBufList.get(splitBufList.size()-1), sPath.substring(0,sPath.lastIndexOf("\\")+1));
+			FileHandler.writeFile(meta.getParityFileName(), splitBufList.get(splitBufList.size()-1), sPath.substring(0,sPath.lastIndexOf(File.separator)+1));
 //System.out.println("new String(splitBufList.get(splitBufList.size()-1)):"+new String(splitBufList.get(splitBufList.size()-1)));
 			ret = true;
 		}catch(Exception e) {
@@ -82,7 +82,7 @@ public class RaidController {
 //System.out.println("tempList:"+tempList);		
 		String targetFileName = null;
 		try {
-			FileHandler.recursiveFind(Paths.get(sPath.substring(0,sPath.lastIndexOf("\\")+1)), p -> {
+			FileHandler.recursiveFind(Paths.get(sPath.substring(0,sPath.lastIndexOf(File.separator)+1)), p -> {
 				aTargetPaths.add(p.toString());
 			});
 //System.out.println("aTargetPaths:"+aTargetPaths);					
@@ -95,8 +95,9 @@ public class RaidController {
 				}
 			}	
 			tempList.remove(targetFileName);
-			tempList.add(sPath.substring(0,sPath.lastIndexOf("\\")+1)+File.separator+meta.getParityFileName());
+			tempList.add(sPath.substring(0,sPath.lastIndexOf(File.separator)+1)+File.separator+meta.getParityFileName());
 			doRaid(tempList);
+			
 			FileHandler.writeFile(targetFileName, splitBufList.get(splitBufList.size()-1));
 			ret = true;
 		}catch(Exception e) {

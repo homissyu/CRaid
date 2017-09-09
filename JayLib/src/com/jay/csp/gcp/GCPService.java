@@ -50,6 +50,7 @@ public class GCPService{
 	    }
 	    outStream.close();
 	    outputChannel.close();
+	    reader.close();
 	}
 }
 	

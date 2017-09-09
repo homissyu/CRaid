@@ -80,7 +80,7 @@ public class CommonConst{
 	public static final String ENCRYPTED = "ENCRYPTED";
 	public static final String SPLIT_RATIO = "SPLIT_RATIO";
 	public static final String META_FILE_NAME = "Meta.craid";
-	public static final String META_FILE_PATH = "c:\\CRaid\\";
+//	public static final String META_FILE_PATH = "/Users/karl/CRaid";
 	
 	public static final String[] CSP_ARRAY = {"AmazonDrive","box","DropBox","FlipDrive","GoogleDrive","HiDrive","Hubic","JumpShare","MEGA","pCloud","Sync.com","Syncplicity","Yandex","MediaFire"};
 	public static final int [] CSP_FREE_AMOUNT = {5,10,2,10,15,5,25,2,50,20,5,10,10,10};

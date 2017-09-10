@@ -95,7 +95,7 @@ public class Debug {
     private static final String LOGGING_LOGFILENAME = "Debug.log";
     private static final int LOGGING_LOGFILE_MAX_LENGTH = 1024 * 1024;
     private static final String LOGGING_LOGFILE_HEADER =
-                "# This is the logfile of the Maxigent logging facility.\n";
+                "# This is the logfile of the CRaid logging facility.\n";
 
     private static boolean mBatchMode = false;
     
@@ -281,7 +281,7 @@ public class Debug {
 
     //--------------------------------------------------
     private static String getDebugLogfileName() {
-        return CommonConst.CRAID_PATH +
+        return CommonConst.CRAID_PATH + File.separator + 
                         LOGGING_LOGFILENAME;
     }
 

@@ -1,5 +1,7 @@
 package com.jay.util;
 
+import java.io.File;
+
 public class CommonConst{
 	public static final String CRAID = "CRAID";
     public static final String CURRENT_DIR = ".";
@@ -13,7 +15,10 @@ public class CommonConst{
     public static final String DEBUG_KIND_DATE = "DATE";
     public static final long Max_DEBUG_FILE_LENGTH = 1024*1024*1024;
     
-    public static final String CRAID_PATH = "c:\\CRaid\\";
+    private static final File rootDir = File.listRoots()[0];
+	private static final File dir = new File(new File(new File(rootDir, "Users"), "karl"), "CRaid");
+	public static final String CRAID_PATH = dir.getAbsolutePath();
+	    	
     public static final String T_DES = "TrippleDES";
     public static final String AES = "AES";
     public static final String AES_CBC_PKCS5 = "AES/CBC/PKCS5Padding";

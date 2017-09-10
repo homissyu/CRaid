@@ -28,13 +28,8 @@ import javax.crypto.SecretKey;
 
 import org.bouncycastle.crypto.CryptoException;
  
-/**
- * A utility class that encrypts or decrypts a file.
- * @author www.codejava.net
- *
- */
 public class CryptoUtils {
-	private String mSubSystem = (this.getClass()).getCanonicalName();
+	private static final String SUB_SYSTEM = "com.jay.util.CryptoUtils";
     private static final String TRANSFORMATION = CommonConst.AES;
     
     /**
@@ -80,9 +75,8 @@ public class CryptoUtils {
     private static Key chkKeyFile() throws Exception{
     		SecretKey aKey = null;
         File file = new File(System.getProperty(CommonConst.USER_DIR_PROP_KEY)+File.separator+CommonConst.LIB_DIR+File.separator+CommonConst.SECRET_KEY_FILE);
-//System.out.println(file.getAbsolutePath());
+        Debug.trace(SUB_SYSTEM, CommonConst.DEVELOPING_MODE, file.getAbsolutePath());
         if(!file.exists()){
-//System.out.println(file.exists());
         		aKey = generateRandomSecretKey(CommonConst.AES);
             FileHandler.writeSerFile(aKey, System.getProperty(CommonConst.USER_DIR_PROP_KEY)+File.separator+CommonConst.LIB_DIR, CommonConst.SECRET_KEY_FILE);
         }else aKey = (SecretKey) FileHandler.readSerFile(System.getProperty(CommonConst.USER_DIR_PROP_KEY)+File.separator+CommonConst.LIB_DIR+File.separator+CommonConst.SECRET_KEY_FILE);
@@ -105,7 +99,6 @@ public class CryptoUtils {
             FileInputStream inputStream = new FileInputStream(inputFile);
             byte[] inputBytes = new byte[(int) inputFile.length()];
             inputStream.read(inputBytes);
-// System.out.println(inputFile.getName());      
             byte[] outputBytes = cipher.doFinal(inputBytes);
              
             FileOutputStream outputStream = new FileOutputStream(outputFile);
@@ -225,7 +218,7 @@ public class CryptoUtils {
 	        KeyPair keyPair = keyGen.generateKeyPair();
 	        return keyPair;
 	    } catch (Exception e) {
-	        System.out.println("Failed to generate key pair!");
+	        Debug.trace(SUB_SYSTEM, CommonConst.OPERATION_MODE, "Failed to generate key pair!");
 	        e.printStackTrace();
 	    }
 	    return null;

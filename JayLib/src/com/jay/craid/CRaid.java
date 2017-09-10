@@ -14,6 +14,12 @@ import com.jay.util.CryptoUtils;
 import com.jay.util.Debug;
 import com.jay.util.FileHandler;
 
+/**
+ * 
+ * @author karl
+ *
+ */
+
 public class CRaid {
 	String mSubSystem = (this.getClass()).getCanonicalName();
 	FileHandler fh = null;
@@ -55,7 +61,7 @@ public class CRaid {
 	public void mergeFile(String sTargetFilePath, String sMetaFilePath) {
 		// TODO Auto-generated method stub
 		try {
-    			MetaCraid meta = (MetaCraid)fh.readSerEncFile(sMetaFilePath);
+    			MetaCraid meta = (MetaCraid)FileHandler.readSerEncFile(sMetaFilePath);
     			Debug.trace(mSubSystem, CommonConst.DEVELOPING_MODE, "sTargetFilePath:"+sTargetFilePath);
     			Debug.trace(mSubSystem, CommonConst.QA_MODE, meta.toString());
 	    		if(meta.isRaidType()) {
@@ -98,10 +104,10 @@ public class CRaid {
 	    		meta.setOriginFilePath(sSourcePath);
 	    		meta.setId(CommonUtil.makeUniqueTimeID(CommonConst.ENC_BYTE_16));
 	    		meta.setOperationType(isEncrypt);
-	    		meta.setSecretKey(cu.generateRandomSecretKey(CommonConst.AES));
+	    		meta.setSecretKey(CryptoUtils.generateRandomSecretKey(CommonConst.AES));
 	    		meta.setRaidType(doRaid);
 
-	    		if(isEncrypt)cu.encrypt(meta.getSecretKey(), sourceFile, encryptedFile);
+	    		if(isEncrypt)CryptoUtils.encrypt(meta.getSecretKey(), sourceFile, encryptedFile);
 	    		raf = new RandomAccessFile(encryptedFilePath, "r");
 	    		long sourceSize = raf.length();
             sourceSize = raf.length();
@@ -223,7 +229,7 @@ public class CRaid {
 	        	if(meta.getRemainingBytes() != null) fOs.write(meta.getRemainingBytes());
             fOs.flush();
             fOs.close();
-            if(doEncrypt)cu.decrypt(meta.getSecretKey(), outputFile, outputFile);
+            if(doEncrypt)CryptoUtils.decrypt(meta.getSecretKey(), outputFile, outputFile);
         }catch(Exception ex){
         		ex.printStackTrace();
         }finally{

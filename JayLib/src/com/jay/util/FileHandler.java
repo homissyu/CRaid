@@ -13,24 +13,20 @@ import java.io.Serializable;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 /**
  * 
- * @author Jay
- * @date 2006. 6. 19.
+ * @author Karl
+ * @date 2017. 6. 19.
  */
 
 public class FileHandler {
-    long lFileSize;
-    static String sFileName;
-    HashMap<File, ArrayList<Integer>> mFileInfoMap = new HashMap<File, ArrayList<Integer>>();
-	ArrayList<ArrayList<String>> mFileInfoList = new ArrayList<ArrayList<String>>();
-
+	
+	String mSubSystem = (this.getClass()).getCanonicalName();
+	
 	public FileHandler(){
 	}
     
@@ -57,7 +53,7 @@ public class FileHandler {
      */
     public void readWrite(RandomAccessFile raf, OutputStream Os, long numBytes) throws IOException {
         byte[] buf = new byte[(int) numBytes];
-// System.out.println("numBytes:"+numBytes);           
+        Debug.trace(mSubSystem, CommonConst.DEVELOPING_MODE, "numBytes:"+numBytes);
         int val = raf.read(buf);
 //        for(int i=0;i<numBytes;i++) {
 //        	System.out.println((char)(buf[i]));
@@ -90,10 +86,8 @@ public class FileHandler {
         String sFilePath = sPath + sFileName;
         File file = null;
         FileOutputStream fos = null;
-        
-//        System.out.println(sPath);
-//        System.out.println(sFilePath);
-        
+        Debug.trace(mSubSystem, CommonConst.DEVELOPING_MODE, "sPath:"+sPath);
+        Debug.trace(mSubSystem, CommonConst.DEVELOPING_MODE, "sFilePath:"+sFilePath);
         try{
             file = new File(sPath);
             if(!file.exists())
@@ -106,7 +100,7 @@ public class FileHandler {
             fos.write(contentBuf);
 
             fos.close();
-// System.out.println(file.exists());
+            Debug.trace(mSubSystem, CommonConst.DEVELOPING_MODE, "file.exists():"+file.exists());
         }catch(Exception ex){
         		ex.printStackTrace();
         }
@@ -204,7 +198,7 @@ public class FileHandler {
         try{
         		file = new File(sFilePath);
             if(!file.exists()) file.createNewFile(); 
-// System.out.println(sFilePath);   
+            Debug.trace(mSubSystem, CommonConst.DEVELOPING_MODE, "sFilePath:"+sFilePath);
             oos = new ObjectOutputStream(new FileOutputStream(sFilePath));
             CryptoUtils.encryptObj((Serializable) obj, oos);
         }catch(Exception ex){
@@ -281,7 +275,7 @@ public class FileHandler {
                 }
             }
         }
-        System.out.println("Is this file ASCII ? : "+ bResult);
+        Debug.trace("com.jay.util.Debug", CommonConst.OPERATION_MODE, "Is this file ASCII ? : "+ bResult);
         return bResult;
     }
 }

@@ -13,6 +13,11 @@ import com.jay.util.CommonUtil;
 import com.jay.util.Debug;
 import com.jay.util.FileHandler;
 
+/**
+ * 
+ * @author karl
+ *
+ */
 public class RaidController {
 	
 	private static ArrayList <byte[]> splitBufList = new ArrayList<byte[]>();

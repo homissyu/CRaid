@@ -342,9 +342,8 @@ public class Debug {
 
     //--------------------------------------------------
     public static void logfilePrint(String s, boolean nl) {
-    		int lineNumber = Thread.currentThread().getStackTrace()[2].getLineNumber();
-        if (mLogFile != null) {
-            String ss = mDateFormat.format(new Date()).toString() + ": "+lineNumber+": " + s;
+    		if (mLogFile != null) {
+            String ss = mDateFormat.format(new Date()).toString() + ": " + s;
             synchronized (mLogFile_sem) {
                 if (nl)
                     mLogFile.println(ss);

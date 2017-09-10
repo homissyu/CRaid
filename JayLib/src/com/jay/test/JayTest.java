@@ -13,6 +13,13 @@ public class JayTest {
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
+		/**
+		 * File rootDir = File.listRoots()[0];
+			File dir = new File(new File(new File(rootDir, "Users"), "Mymac"), "Desktop");
+			if (!dir.exists()){
+			    dir.mkdirs();
+			}
+		 */
 		String sSourcePath = "/Users/karl/CRaid/";
 		String sSourceFileName = "astx.dmg";
 		String sSourceFilePath = sSourcePath + sSourceFileName;

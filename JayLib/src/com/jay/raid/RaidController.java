@@ -16,8 +16,8 @@ import com.jay.util.FileHandler;
 public class RaidController {
 	
 	private static ArrayList <byte[]> splitBufList = new ArrayList<byte[]>();
-	
-	static String mSubSystem = "com.jay.raid.RaidController";
+	FileHandler fh = new FileHandler();
+	String mSubSystem = (this.getClass()).getCanonicalName();
 	public RaidController() {
 		Debug.addSubsystems(mSubSystem);
 	}
@@ -27,8 +27,8 @@ public class RaidController {
 	 * @param fileNames
 	 * @throws IOException
 	 */
-	private static void doRaid(ArrayList<String> fileNames) throws IOException {
-//System.out.println("doRaid fileNames:"+fileNames);		
+	private void doRaid(ArrayList<String> fileNames) throws IOException {
+		Debug.trace(mSubSystem, CommonConst.DEVELOPING_MODE, "doRaid fileNames:"+fileNames);
 		int bufSize = 0;
 		RandomAccessFile raf = null;
 		for(int i=0;i<fileNames.size();i++) {
@@ -40,17 +40,17 @@ public class RaidController {
 		}
 		
 		byte [] parityBuf = new byte[bufSize];
-//System.out.println(System.lineSeparator());
+
 		for(int i=0;i<bufSize;i++) {
 			for(int k=0;k<splitBufList.size()-1;k++) {
 				if(k==0) parityBuf[i] = (byte) ((splitBufList.get(k))[i]^(splitBufList.get(k+1))[i]);
 				else parityBuf[i] ^= (byte)(splitBufList.get(k+1))[i];
 			}
-//System.out.println((char)parityBuf[i]);
+			Debug.trace(mSubSystem, CommonConst.DEVELOPING_MODE, String.valueOf((char)parityBuf[i]));
 		}
 		
 		splitBufList.add(parityBuf);	
-//System.out.println("new String(parityBuf):"+new String(parityBuf));
+		Debug.trace(mSubSystem, CommonConst.DEVELOPING_MODE, "new String(parityBuf):"+new String(parityBuf));
 	}
 	
 	/**
@@ -60,13 +60,13 @@ public class RaidController {
 	 * @return boolean
 	 */
 	@SuppressWarnings("finally")
-	public static boolean backup(String sPath, MetaCraid meta) {
+	public boolean backup(String sPath, MetaCraid meta) {
 		boolean ret = false;
 		try {
 			meta.setParityFileName(CommonUtil.makeUniqueID(24));
 			doRaid(meta.getSplitFileNames());
-			FileHandler.writeFile(meta.getParityFileName(), splitBufList.get(splitBufList.size()-1), sPath.substring(0,sPath.lastIndexOf(File.separator)+1));
-//System.out.println("new String(splitBufList.get(splitBufList.size()-1)):"+new String(splitBufList.get(splitBufList.size()-1)));
+			fh.writeFile(meta.getParityFileName(), splitBufList.get(splitBufList.size()-1), sPath.substring(0,sPath.lastIndexOf(File.separator)+1));
+			Debug.trace(mSubSystem, CommonConst.DEVELOPING_MODE, "new String(splitBufList.get(splitBufList.size()-1)):"+new String(splitBufList.get(splitBufList.size()-1)));
 			ret = true;
 		}catch(Exception e) {
 			e.printStackTrace();
@@ -82,22 +82,22 @@ public class RaidController {
 	 * @return boolean
 	 */
 	@SuppressWarnings({ "finally", "unchecked" })
-	public static boolean recover(String sPath, MetaCraid meta) {
+	public boolean recover(String sPath, MetaCraid meta) {
 		boolean ret = false;
 		ArrayList<String> aTargetPaths = new ArrayList<String>();
 		ArrayList<String> tempList = (ArrayList<String>)(meta.getSplitFileNames().clone());
-//System.out.println("tempList:"+tempList);		
+		Debug.trace(mSubSystem, CommonConst.DEVELOPING_MODE, "tempList:"+tempList);
 		String targetFileName = null;
 		try {
-			FileHandler.recursiveFind(Paths.get(sPath.substring(0,sPath.lastIndexOf(File.separator)+1)), p -> {
+			fh.recursiveFind(Paths.get(sPath.substring(0,sPath.lastIndexOf(File.separator)+1)), p -> {
 				aTargetPaths.add(p.toString());
 			});
-//System.out.println("aTargetPaths:"+aTargetPaths);					
+			Debug.trace(mSubSystem, CommonConst.DEVELOPING_MODE, "aTargetPaths:"+aTargetPaths);
 			Iterator<String> it = tempList.iterator();
 			while(it.hasNext()) {
 				targetFileName = it.next();
 				if(!aTargetPaths.contains(targetFileName)) {
-//System.out.println("missing le:"+targetFileName);
+					Debug.trace(mSubSystem, CommonConst.DEBUG_MODE, "missing file:"+targetFileName);
 					break;
 				}
 			}	
@@ -105,7 +105,7 @@ public class RaidController {
 			tempList.add(sPath.substring(0,sPath.lastIndexOf(File.separator)+1)+File.separator+meta.getParityFileName());
 			doRaid(tempList);
 			
-			FileHandler.writeFile(targetFileName, splitBufList.get(splitBufList.size()-1));
+			fh.writeFile(targetFileName, splitBufList.get(splitBufList.size()-1));
 			ret = true;
 		}catch(Exception e) {
 			e.printStackTrace();

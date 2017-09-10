@@ -16,8 +16,12 @@ import com.jay.util.FileHandler;
 
 public class CRaid {
 	String mSubSystem = (this.getClass()).getCanonicalName();
+	FileHandler fh = null;
+	CryptoUtils cu = null;
 	public CRaid() {
 		Debug.addSubsystems(mSubSystem);
+		cu = new CryptoUtils();
+		fh = new FileHandler();
 	}
 	
 	/**
@@ -32,11 +36,12 @@ public class CRaid {
 		try {
     			MetaCraid meta = splitOperation(sSourceFilePath, aSplitRatio, doEncrypt, doRaid);
     			if(doRaid) {
-		    		if(RaidController.backup(sSourceFilePath, meta))
-		    			FileHandler.writeSerEncFile(meta, sMetaFilePath);
+    				RaidController rc = new RaidController();
+		    		if(rc.backup(sSourceFilePath, meta))
+		    			fh.writeSerEncFile(meta, sMetaFilePath);
 		    		else throw new Exception("Failed RAID");
-	    		}else FileHandler.writeSerEncFile(meta, sMetaFilePath);
-    			Debug.trace(mSubSystem, CommonConst.DEBUG_MODE, meta.toString());
+	    		}else fh.writeSerEncFile(meta, sMetaFilePath);
+    			Debug.trace(mSubSystem, CommonConst.QA_MODE, meta.toString());
 	    } catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -50,12 +55,12 @@ public class CRaid {
 	public void mergeFile(String sTargetFilePath, String sMetaFilePath) {
 		// TODO Auto-generated method stub
 		try {
-    			MetaCraid meta = (MetaCraid)FileHandler.readSerEncFile(sMetaFilePath);
-//    System.out.println("sTargetFilePath:"+sTargetFilePath);
-//    System.out.println(meta);
-//    			Debug.trace(mSubSystem, CommonConst.DEVELOPING_MODE, meta.toString());
+    			MetaCraid meta = (MetaCraid)fh.readSerEncFile(sMetaFilePath);
+    			Debug.trace(mSubSystem, CommonConst.DEVELOPING_MODE, "sTargetFilePath:"+sTargetFilePath);
+    			Debug.trace(mSubSystem, CommonConst.QA_MODE, meta.toString());
 	    		if(meta.isRaidType()) {
-		    		if(RaidController.recover(sTargetFilePath, meta))
+	    			RaidController rc = new RaidController();
+		    		if(rc.recover(sTargetFilePath, meta))
 		    			mergeOperation(meta, sTargetFilePath, meta.getOperationType());
 		    		else throw new Exception("Failed Recover from RAID");
 	    		}else mergeOperation(meta, sTargetFilePath, meta.getOperationType());
@@ -93,10 +98,10 @@ public class CRaid {
 	    		meta.setOriginFilePath(sSourcePath);
 	    		meta.setId(CommonUtil.makeUniqueTimeID(CommonConst.ENC_BYTE_16));
 	    		meta.setOperationType(isEncrypt);
-	    		meta.setSecretKey(CryptoUtils.generateRandomSecretKey(CommonConst.AES));
+	    		meta.setSecretKey(cu.generateRandomSecretKey(CommonConst.AES));
 	    		meta.setRaidType(doRaid);
 
-	    		if(isEncrypt)CryptoUtils.encrypt(meta.getSecretKey(), sourceFile, encryptedFile);
+	    		if(isEncrypt)cu.encrypt(meta.getSecretKey(), sourceFile, encryptedFile);
 	    		raf = new RandomAccessFile(encryptedFilePath, "r");
 	    		long sourceSize = raf.length();
             sourceSize = raf.length();
@@ -126,13 +131,13 @@ public class CRaid {
 	                Debug.trace(mSubSystem, CommonConst.DEVELOPING_MODE, destIx+":numRemainingRead:"+numRemainingRead);
 
 	                for(int i=0; i<numReads; i++) {
-	                    FileHandler.readWrite(raf, bw, maxReadBufferSize);
+	                    fh.readWrite(raf, bw, maxReadBufferSize);
 	                }
 	                if(numRemainingRead > 0) {
-	                		FileHandler.readWrite(raf, bw, numRemainingRead);
+	                		fh.readWrite(raf, bw, numRemainingRead);
 	                }
 	            }else {
-	            		FileHandler.readWrite(raf, bw, bytesPerSplit);
+	            		fh.readWrite(raf, bw, bytesPerSplit);
 	            }
 	            bw.flush();
 	            splitFileNames.add(aTempFileName);
@@ -176,27 +181,27 @@ public class CRaid {
      * @param sSplitRatio
      * @param doRaid
      */
-    private static void calcSplitRatio(long fileLength, ArrayList<Integer> sSplitRatio, boolean doRaid){
+    private void calcSplitRatio(long fileLength, ArrayList<Integer> sSplitRatio, boolean doRaid){
 	    	int totalLength = 0;
 	    	int itemCnt = sSplitRatio.size();
 	    	int unitLength = 0;
-	// System.out.println("fileLength:"+fileLength); 
-	// System.out.println("itemCnt:"+itemCnt);
+	    	Debug.trace(mSubSystem, CommonConst.DEVELOPING_MODE, "fileLength:"+fileLength);
+	    	Debug.trace(mSubSystem, CommonConst.DEVELOPING_MODE, "itemCnt:"+itemCnt);
 	    	for(int i=0;i<itemCnt;i++) {
 	    		totalLength += sSplitRatio.get(i);
 	    	} 
-	// System.out.println("totalLength:"+totalLength);   	
+	    	Debug.trace(mSubSystem, CommonConst.DEVELOPING_MODE, "totalLength:"+totalLength);
 	    	if(doRaid) {
 	    		unitLength = (int) (fileLength / itemCnt);        	
 	    	}else{
 	    		if(totalLength % itemCnt == 0) unitLength = (int) (fileLength / totalLength);
 	        	else unitLength = (int) ((fileLength/totalLength)+1);
 	    	}
-	// System.out.println("unitLength:"+unitLength);
+	    	Debug.trace(mSubSystem, CommonConst.DEVELOPING_MODE, "unitLength:"+unitLength);
 	    	for(int i=0;i<itemCnt;i++) {
 	    		sSplitRatio.set(i, (doRaid?1:sSplitRatio.get(i)) * unitLength);
 	    	}
-	// System.out.println("sSplitRatio:"+sSplitRatio);    	
+	    	Debug.trace(mSubSystem, CommonConst.DEVELOPING_MODE, "sSplitRatio:"+sSplitRatio);
     }
     
     /**
@@ -204,22 +209,21 @@ public class CRaid {
      * @param sOutPutFilePath
      * @param doEncrypt
      */
-    public static void mergeOperation(MetaCraid meta, String sOutPutFilePath, boolean doEncrypt){
-//    	System.out.println(meta);
+    public void mergeOperation(MetaCraid meta, String sOutPutFilePath, boolean doEncrypt){
         ArrayList<String> aSplitFileList = meta.getSplitFileNames();
-//  System.out.println("aSplitFileList:"+aSplitFileList);  	
+        Debug.trace(mSubSystem, CommonConst.DEVELOPING_MODE, "aSplitFileList:"+aSplitFileList);
         FileOutputStream fOs = null;
         try{
 	        	File outputFile = new File(sOutPutFilePath);
 	        	fOs = new FileOutputStream(outputFile);
 	        	for(int destIx=0; destIx < aSplitFileList.size() ; destIx++) {
 	            	RandomAccessFile raf = new RandomAccessFile((String)aSplitFileList.get(destIx), "r");
-	            	FileHandler.readWrite(raf, fOs);
+	            	fh.readWrite(raf, fOs);
 	        	}
 	        	if(meta.getRemainingBytes() != null) fOs.write(meta.getRemainingBytes());
             fOs.flush();
             fOs.close();
-            if(doEncrypt)CryptoUtils.decrypt(meta.getSecretKey(), outputFile, outputFile);
+            if(doEncrypt)cu.decrypt(meta.getSecretKey(), outputFile, outputFile);
         }catch(Exception ex){
         		ex.printStackTrace();
         }finally{

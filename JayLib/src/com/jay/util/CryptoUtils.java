@@ -34,8 +34,9 @@ import org.bouncycastle.crypto.CryptoException;
  *
  */
 public class CryptoUtils {
+	private String mSubSystem = (this.getClass()).getCanonicalName();
     private static final String TRANSFORMATION = CommonConst.AES;
- 
+    
     /**
      * 
      * @param key
@@ -43,8 +44,7 @@ public class CryptoUtils {
      * @param outputFile
      * @throws CryptoException
      */
-    public static void encrypt(Key key, File inputFile, File outputFile)
-            throws CryptoException {
+    public static void encrypt(Key key, File inputFile, File outputFile) throws CryptoException {
         doCrypto(Cipher.ENCRYPT_MODE, key, inputFile, outputFile);
     }
  
@@ -55,8 +55,7 @@ public class CryptoUtils {
      * @param outputFile
      * @throws CryptoException
      */
-    public static void decrypt(Key key, File inputFile, File outputFile)
-            throws CryptoException {
+    public static void decrypt(Key key, File inputFile, File outputFile) throws CryptoException {
         doCrypto(Cipher.DECRYPT_MODE, key, inputFile, outputFile);
     }
     
@@ -128,19 +127,18 @@ public class CryptoUtils {
      */
     public static void encryptObj(Serializable object, OutputStream ostream) throws Exception {
 	    try {
-	    	Cipher cipher = Cipher.getInstance(TRANSFORMATION);
-	    	// Create cipher
+	    		Cipher cipher = Cipher.getInstance(TRANSFORMATION);
+	    		// Create cipher
 	        synchronized(cipher){
                 cipher.init(Cipher.ENCRYPT_MODE, chkKeyFile());
-    	        SealedObject sealedObject = new SealedObject(object, cipher);
+    	        		SealedObject sealedObject = new SealedObject(object, cipher);
 
-    	        // Wrap the output stream
-    	        CipherOutputStream cos = new CipherOutputStream(ostream, cipher);
-    	        ObjectOutputStream outputStream = new ObjectOutputStream(cos);
-    	        outputStream.writeObject(sealedObject);
-    	        outputStream.close();
+	    	        // Wrap the output stream
+	    	        CipherOutputStream cos = new CipherOutputStream(ostream, cipher);
+	    	        ObjectOutputStream outputStream = new ObjectOutputStream(cos);
+	    	        outputStream.writeObject(sealedObject);
+	    	        outputStream.close();
             }
-	        
 	    } catch (IllegalBlockSizeException e) {
 	        e.printStackTrace();
 	    }
@@ -178,15 +176,15 @@ public class CryptoUtils {
 	 * @throws Exception
 	 */
     public static void encryptStream(Key key, InputStream in, OutputStream out)  throws Exception{
-    	byte[] buf = new byte[1024];
-    	Cipher cipher = Cipher.getInstance(TRANSFORMATION);
+    		byte[] buf = new byte[1024];
+    		Cipher cipher = Cipher.getInstance(TRANSFORMATION);
         cipher.init(Cipher.ENCRYPT_MODE, key);
         
         out = new javax.crypto.CipherOutputStream(out, cipher);
 
         int numRead = 0;
         while ((numRead = in.read(buf)) >= 0) {
-          out.write(buf, 0, numRead);
+        		out.write(buf, 0, numRead);
         }
         out.close();
     }
@@ -199,14 +197,14 @@ public class CryptoUtils {
      * @throws Exception
      */
     public static void decryptStream(Key sk, InputStream in, OutputStream out)  throws Exception{
-    	byte[] buf = new byte[1024];
-    	Cipher cipher = Cipher.getInstance(TRANSFORMATION);
-    	cipher.init(Cipher.ENCRYPT_MODE, sk);
+	    	byte[] buf = new byte[1024];
+	    	Cipher cipher = Cipher.getInstance(TRANSFORMATION);
+	    	cipher.init(Cipher.ENCRYPT_MODE, sk);
         in = new javax.crypto.CipherInputStream(in, cipher);
 
         int numRead = 0;
         while ((numRead = in.read(buf)) >= 0) {
-          out.write(buf, 0, numRead);
+        		out.write(buf, 0, numRead);
         }
 //        out.close();
       }
@@ -218,7 +216,7 @@ public class CryptoUtils {
      */
     public static KeyPair getKeyPair(String password) {
 	    try {   
-	    	ByteArrayInputStream bis = new ByteArrayInputStream(getSuperSeed(password));
+	    		ByteArrayInputStream bis = new ByteArrayInputStream(getSuperSeed(password));
 		    ObjectInput in = new ObjectInputStream(bis);
 		    SecureRandom sr = (SecureRandom)in.readObject(); 
 

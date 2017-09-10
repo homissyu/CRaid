@@ -38,7 +38,7 @@ public class FileHandler {
 	 * @param path
 	 * @param c
 	 */
-	public static void recursiveFind(Path path, Consumer<Path> c) {
+	public void recursiveFind(Path path, Consumer<Path> c) {
 		try (DirectoryStream<Path> newDirectoryStream = Files.newDirectoryStream(path)) {
 			StreamSupport.stream(newDirectoryStream.spliterator(), false).peek(p -> {
 				c.accept(p);
@@ -55,7 +55,7 @@ public class FileHandler {
      * @param numBytes
      * @throws IOException
      */
-    public static void readWrite(RandomAccessFile raf, OutputStream Os, long numBytes) throws IOException {
+    public void readWrite(RandomAccessFile raf, OutputStream Os, long numBytes) throws IOException {
         byte[] buf = new byte[(int) numBytes];
 // System.out.println("numBytes:"+numBytes);           
         int val = raf.read(buf);
@@ -72,7 +72,7 @@ public class FileHandler {
      * @param Os
      * @throws IOException
      */
-    public static void readWrite(RandomAccessFile raf, OutputStream Os) throws IOException {
+    public void readWrite(RandomAccessFile raf, OutputStream Os) throws IOException {
         byte[] buf = new byte[(int)raf.length()];
         int val = raf.read(buf);
         if(val != -1) {
@@ -86,7 +86,7 @@ public class FileHandler {
      * @param sPath
      * @throws JayException
      */
-    public static void writeFile(String sFileName, byte[] contentBuf, String sPath){
+    public void writeFile(String sFileName, byte[] contentBuf, String sPath){
         String sFilePath = sPath + sFileName;
         File file = null;
         FileOutputStream fos = null;
@@ -116,7 +116,7 @@ public class FileHandler {
      * @param sFilePath
      * @param contentBuf
      */
-    public static void writeFile(String sFilePath, byte[] contentBuf){
+    public void writeFile(String sFilePath, byte[] contentBuf){
         File file = null;
         FileOutputStream fos = null;
         
@@ -198,12 +198,10 @@ public class FileHandler {
      * @param sPath
      * @throws JayException
      */
-    public static void writeSerEncFile(Object obj, String sFilePath){
+    public void writeSerEncFile(Object obj, String sFilePath){
     	    ObjectOutputStream oos = null;
         File file = null;
         try{
-//        		file = new File(sFilePath);
-//        		if(!file.exists()) file.mkdirs();
         		file = new File(sFilePath);
             if(!file.exists()) file.createNewFile(); 
 // System.out.println(sFilePath);   
@@ -229,9 +227,7 @@ public class FileHandler {
             if(file.exists()){
                 fileIn = new FileInputStream(sFileName);
                 ObjectInputStream ois = new ObjectInputStream(fileIn);
-                
                 oRet = CryptoUtils.decryptObj(ois);
-                
             }
         } catch (Exception ex) {
         		ex.printStackTrace();

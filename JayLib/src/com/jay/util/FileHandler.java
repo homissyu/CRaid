@@ -2,6 +2,7 @@ package com.jay.util;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -53,13 +54,9 @@ public class FileHandler {
      */
     public void readWrite(RandomAccessFile raf, OutputStream Os, long numBytes) throws IOException {
         byte[] buf = new byte[(int) numBytes];
-        Debug.trace(mSubSystem, CommonConst.DEVELOPING_MODE, "numBytes:"+numBytes);
         int val = raf.read(buf);
-//        for(int i=0;i<numBytes;i++) {
-//        	System.out.println((char)(buf[i]));
-//        }
         if(val != -1) {
-        		Os.write(buf);
+        	Os.write(buf);
         }   	
     }
     
@@ -69,11 +66,7 @@ public class FileHandler {
      * @throws IOException
      */
     public void readWrite(RandomAccessFile raf, OutputStream Os) throws IOException {
-        byte[] buf = new byte[(int)raf.length()];
-        int val = raf.read(buf);
-        if(val != -1) {
-        		Os.write(buf);
-        }   	
+    	readWrite(raf, Os, raf.length());
     }
     
     /**
@@ -83,27 +76,32 @@ public class FileHandler {
      * @throws JayException
      */
     public void writeFile(String sFileName, byte[] contentBuf, String sPath){
+    	System.out.println(sPath);
         String sFilePath = sPath + sFileName;
-        File file = null;
-        FileOutputStream fos = null;
-        Debug.trace(mSubSystem, CommonConst.DEVELOPING_MODE, "sPath:"+sPath);
-        Debug.trace(mSubSystem, CommonConst.DEVELOPING_MODE, "sFilePath:"+sFilePath);
         try{
-            file = new File(sPath);
-            if(!file.exists())
-                file.mkdirs();
-            file = new File(sFilePath);
-            if(!file.exists())
-                file.createNewFile(); 
-
-            fos = new FileOutputStream(sFilePath);
-            fos.write(contentBuf);
-
-            fos.close();
-            Debug.trace(mSubSystem, CommonConst.DEVELOPING_MODE, "file.exists():"+file.exists());
+            if(checkPath(sPath)) writeFile(sFilePath, contentBuf);
+            else throw new FileNotFoundException();
         }catch(Exception ex){
         		ex.printStackTrace();
         }
+    }
+    
+    private static boolean checkFilePath(String aFilePath) throws IOException {
+    	boolean ret = false;
+    	File file = new File(aFilePath);
+        if(!file.exists())
+            file.createNewFile();
+        ret = true;
+    	return ret;
+    }
+    
+    private static boolean checkPath(String aPath) throws IOException {
+    	boolean ret = false;
+    	File file = new File(aPath);
+        if(!file.exists())
+            file.mkdirs();
+        ret = true;
+    	return ret;
     }
     
     /**
@@ -111,20 +109,21 @@ public class FileHandler {
      * @param contentBuf
      */
     public void writeFile(String sFilePath, byte[] contentBuf){
-        File file = null;
         FileOutputStream fos = null;
-        
         try{
-            file = new File(sFilePath);
-            if(!file.exists())
-                file.createNewFile(); 
-
-            fos = new FileOutputStream(sFilePath);
-            fos.write(contentBuf);
-
-            fos.close();
+            if(checkFilePath(sFilePath)) {
+            	fos = new FileOutputStream(sFilePath);
+                fos.write(contentBuf);
+                fos.close();
+            } else throw new FileNotFoundException();
         }catch(Exception ex){
-        		ex.printStackTrace();
+        	ex.printStackTrace();
+        }finally {
+        	try {
+        		if(fos!=null)fos.close();
+        	}catch(Exception e) {
+        		e.printStackTrace();
+        	}
         }
     }
     
@@ -137,21 +136,20 @@ public class FileHandler {
      */
     public static void writeSerFile(Object obj, String sPath, String sFileName){
         ObjectOutputStream oos = null;
-        File file = null;
-        String sFilePath = sPath + File.separator + sFileName;
         try{
-        	file = new File(sPath);
-            if(!file.exists())
-                file.mkdirs();
-            file = new File(sFilePath);
-            if(!file.exists())
-                file.createNewFile(); 
-            
-            oos = new ObjectOutputStream(new FileOutputStream(sPath+File.separator+sFileName));
-            oos.writeObject(obj);
-            oos.close();
+        	if(checkPath(sPath) && checkFilePath(sPath + File.separator + sFileName)) {
+    			oos = new ObjectOutputStream(new FileOutputStream(sPath+File.separator+sFileName));
+                oos.writeObject(obj);
+                oos.close();        		
+        	}else throw new FileNotFoundException();
         }catch(Exception ex){
         		ex.printStackTrace();
+        }finally {
+        	try {
+        		if(oos!=null)oos.close();
+        	}catch(Exception e) {
+        		e.printStackTrace();
+        	}
         }
     }
     
@@ -161,23 +159,22 @@ public class FileHandler {
      * @return oRet
      * @throws JayException
      */
-    public static Object readSerFile(String sFileName){
+    public static Object readSerFile(String sFilePath){
         FileInputStream fileIn = null;
         Object oRet = null;
-        File file = null;
         ObjectInputStream ois = null;
         try {
-            file = new File(sFileName);
-            if(file.exists()){
-                fileIn = new FileInputStream(sFileName);
+            if(checkFilePath(sFilePath)) {
+        	    fileIn = new FileInputStream(sFilePath);
                 ois = new ObjectInputStream(fileIn);
                 oRet = ois.readObject();
-            }
+            }else throw new FileNotFoundException();
         } catch (Exception ex) {
         		ex.printStackTrace();
         } finally {
             try {
                 if(fileIn!=null)fileIn.close();
+                if(ois!=null)ois.close();
             } catch (IOException ex) {
             		ex.printStackTrace();
             }
@@ -193,14 +190,13 @@ public class FileHandler {
      * @throws JayException
      */
     public void writeSerEncFile(Object obj, String sFilePath){
-    	    ObjectOutputStream oos = null;
-        File file = null;
+    	ObjectOutputStream oos = null;
         try{
-        		file = new File(sFilePath);
-            if(!file.exists()) file.createNewFile(); 
-            Debug.trace(mSubSystem, CommonConst.DEVELOPING_MODE, "sFilePath:"+sFilePath);
-            oos = new ObjectOutputStream(new FileOutputStream(sFilePath));
-            CryptoUtils.encryptObj((Serializable) obj, oos);
+        	if(checkFilePath(sFilePath)) {
+	            Debug.trace(mSubSystem, CommonConst.DEVELOPING_MODE, "sFilePath:"+sFilePath, Thread.currentThread().getStackTrace()[1].getLineNumber());
+	            oos = new ObjectOutputStream(new FileOutputStream(sFilePath));
+	            CryptoUtils.encryptObj((Serializable) obj, oos);
+        	}else throw new FileNotFoundException();
         }catch(Exception ex){
         		ex.printStackTrace();
         }
@@ -212,22 +208,22 @@ public class FileHandler {
      * @return oRet
      * @throws JayException
      */
-    public static Object readSerEncFile(String sFileName){
+    public static Object readSerEncFile(String sFilePath){
         FileInputStream fileIn = null;
         Object oRet = null;
-        File file = null;
+        ObjectInputStream ois = null;
         try {
-            file = new File(sFileName);
-            if(file.exists()){
-                fileIn = new FileInputStream(sFileName);
-                ObjectInputStream ois = new ObjectInputStream(fileIn);
+            if(checkFilePath(sFilePath)){
+                fileIn = new FileInputStream(sFilePath);
+                ois = new ObjectInputStream(fileIn);
                 oRet = CryptoUtils.decryptObj(ois);
-            }
+            }else throw new FileNotFoundException();
         } catch (Exception ex) {
         		ex.printStackTrace();
         } finally {
             try {
                 if(fileIn!=null)fileIn.close();
+                if(ois!=null)ois.close();
             } catch (IOException ex) {
             		ex.printStackTrace();
             }
@@ -240,7 +236,7 @@ public class FileHandler {
      * @param filename
      * @return boolean bResult 
      */
-    public static boolean isASCII(String filename) {
+    public boolean isASCII(String filename) {
 		boolean bResult = false;
         FileReader inputStream = null;
         try {
@@ -250,32 +246,30 @@ public class FileHandler {
                 Character.UnicodeBlock block = Character.UnicodeBlock.of(c);
                 if (block == Character.UnicodeBlock.BASIC_LATIN || block == Character.UnicodeBlock.GREEK) {
 //                         (9)Horizontal Tab (10)Line feed  (11)Vertical tab (13)Carriage return (32)Space (126)tilde
-                    if (c==9 || c == 10 || c == 11 || c == 13 || (c >= 32 && c <= 126)) {
-                    		bResult = true;
+                	if (c==9 || c == 10 || c == 11 || c == 13 || (c >= 32 && c <= 126)) {
+                		bResult = true;
 //                                (153)Superscript two (160)ϊ  (255) No break space                     
                     } else if (c == 153 || c >= 160 && c <= 255) {
-                    		bResult = true;
+                		bResult = true;
 //                                (884)ʹ (885)͵ (890)ͺ (894); (900)' (974)ώ     
                     } else if (c == 884 || c == 885 || c == 890 || c == 894 || c >= 900 && c <= 1019) {
-                    		bResult = true;
+                		bResult = true;
                     } else {                        
-                    		bResult = false;
-                    		break;
+                		bResult = false;
+                		break;
                     }
                 }                
             }
         } catch (Exception ex) {
-        		ex.printStackTrace();
+    		ex.printStackTrace();
         } finally {
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (IOException ex) {
-                		ex.printStackTrace();
-                }
+        	try {
+            	if (inputStream != null) inputStream.close();
+            } catch (IOException ex) {
+        		ex.printStackTrace();
             }
         }
-        Debug.trace("com.jay.util.Debug", CommonConst.OPERATION_MODE, "Is this file ASCII ? : "+ bResult);
+        Debug.trace("com.jay.util.Debug", CommonConst.OPERATION_MODE, "Is this file ASCII ? : "+ bResult, Thread.currentThread().getStackTrace()[1].getLineNumber());
         return bResult;
     }
 }

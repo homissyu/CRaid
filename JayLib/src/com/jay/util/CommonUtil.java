@@ -14,7 +14,7 @@ import java.util.TimeZone;
 
 /**
  *
- * @author Jay
+ * @author Karl
  */
 public class CommonUtil {
     Dimension dm = null;

@@ -23,6 +23,7 @@ public class RaidController {
 	private static ArrayList <byte[]> splitBufList = new ArrayList<byte[]>();
 	FileHandler fh = new FileHandler();
 	String mSubSystem = (this.getClass()).getCanonicalName();
+	
 	public RaidController() {
 		Debug.addSubsystems(mSubSystem);
 	}
@@ -33,7 +34,7 @@ public class RaidController {
 	 * @throws IOException
 	 */
 	private void doRaid(ArrayList<String> fileNames) throws IOException {
-		Debug.trace(mSubSystem, CommonConst.DEVELOPING_MODE, "doRaid fileNames:"+fileNames);
+		Debug.trace(mSubSystem, CommonConst.DEVELOPING_MODE, "doRaid fileNames:"+fileNames, Thread.currentThread().getStackTrace()[1].getLineNumber());
 		int bufSize = 0;
 		RandomAccessFile raf = null;
 		for(int i=0;i<fileNames.size();i++) {
@@ -51,11 +52,8 @@ public class RaidController {
 				if(k==0) parityBuf[i] = (byte) ((splitBufList.get(k))[i]^(splitBufList.get(k+1))[i]);
 				else parityBuf[i] ^= (byte)(splitBufList.get(k+1))[i];
 			}
-			Debug.trace(mSubSystem, CommonConst.DEVELOPING_MODE, String.valueOf((char)parityBuf[i]));
 		}
-		
-		splitBufList.add(parityBuf);	
-		Debug.trace(mSubSystem, CommonConst.DEVELOPING_MODE, "new String(parityBuf):"+new String(parityBuf));
+		splitBufList.add(parityBuf);
 	}
 	
 	/**
@@ -71,7 +69,6 @@ public class RaidController {
 			meta.setParityFileName(CommonUtil.makeUniqueID(24));
 			doRaid(meta.getSplitFileNames());
 			fh.writeFile(meta.getParityFileName(), splitBufList.get(splitBufList.size()-1), sPath.substring(0,sPath.lastIndexOf(File.separator)+1));
-			Debug.trace(mSubSystem, CommonConst.DEVELOPING_MODE, "new String(splitBufList.get(splitBufList.size()-1)):"+new String(splitBufList.get(splitBufList.size()-1)));
 			ret = true;
 		}catch(Exception e) {
 			e.printStackTrace();
@@ -97,12 +94,12 @@ public class RaidController {
 			fh.recursiveFind(Paths.get(sPath.substring(0,sPath.lastIndexOf(File.separator)+1)), p -> {
 				aTargetPaths.add(p.toString());
 			});
-			Debug.trace(mSubSystem, CommonConst.DEVELOPING_MODE, "aTargetPaths:"+aTargetPaths);
+			Debug.trace(mSubSystem, CommonConst.DEVELOPING_MODE, "aTargetPaths:"+aTargetPaths, Thread.currentThread().getStackTrace()[1].getLineNumber());
 			Iterator<String> it = tempList.iterator();
 			while(it.hasNext()) {
 				targetFileName = it.next();
 				if(!aTargetPaths.contains(targetFileName)) {
-					Debug.trace(mSubSystem, CommonConst.DEBUG_MODE, "missing file:"+targetFileName);
+					Debug.trace(mSubSystem, CommonConst.DEBUG_MODE, "missing file:"+targetFileName, Thread.currentThread().getStackTrace()[1].getLineNumber());
 					break;
 				}
 			}	

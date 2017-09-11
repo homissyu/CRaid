@@ -64,7 +64,6 @@ public class Debug {
     // set this to max so it checks size at startup
     private static int mNumWrites = NUMWRITESFORTRUNC;
 
-    private static boolean mInitialized = false;
     private static ArrayList<String> mSubSystems = new ArrayList<String>();
     private static int mVerbosity = 1;
 
@@ -76,7 +75,15 @@ public class Debug {
     private static File mLogFileFile = null;
     // full path and name of the log file.
     private static String mLogFilePath = null;
-    private static String mLogFileName = null;
+    public static synchronized final String getLogFilePath() {
+		return mLogFilePath;
+	}
+
+	public static synchronized final void setLogFilePath(String mLogFilePath) {
+		Debug.mLogFilePath = mLogFilePath;
+	}
+
+	private static String mLogFileName = null;
     private static boolean mClosingLogfile = false;
 
     // PrintWriter wrapper for STDOUT
@@ -100,36 +107,6 @@ public class Debug {
     private static boolean mBatchMode = false;
     
     
-    // Constructor, read environment variable and set data members
-    //--------------------------------------------------
-    public Debug(String sSubSystem, int iVerbosity, String sDebugType) throws Exception {
-        if (mInitialized)
-            return;
-
-        mStdOut = new PrintWriter(System.out, true);
-
-        String env = sSubSystem;
-        addSubsystems(env);
-        mVerbosity = iVerbosity;
-
-        String tmp = sDebugType;
-        if ( tmp.equals(CommonConst.LOG_TYPE_SIZE) ) {
-            mIsMakingBySize = true;
-        } else {
-            mIsMakingBySize = false;
-        }
-
-        mMaxLogFileSize = CommonConst.Max_DEBUG_FILE_LENGTH;
-
-        String fosFileName = CommonConst.CRAID_PATH + LOGGING_LOGFILENAME;
-        File fosFile = new File(fosFileName);
-        if (!fosFile.exists()) {
-            debugLogfilePrint("");
-        }
-
-        mInitialized = true;
-    }    
-    
     public static void setStdOut() {;
     		mStdOut = new PrintWriter(System.out, true);
     }
@@ -142,7 +119,7 @@ public class Debug {
     //--------------------------------------------------
     public static void setVerbosity(int aVerbosity) {
         trace(SUBSYSTEM, 1, "Setting trace verbosity to " + aVerbosity);
-        mVerbosity = aVerbosity;
+        mVerbosity = aVerbosity;        
     }
 
     //--------------------------------------------------
@@ -171,12 +148,6 @@ public class Debug {
 
         try {
             synchronized (mLogFile_sem) {
-                String logPath = CommonConst.CRAID_PATH;
-                File log = new File(logPath);
-                if (! log.exists()) {
-                    log.mkdir();
-                }
-
                 if ( mIsMakingBySize ) {
                     mLogFileName = aLogFileName;
                 } else {
@@ -281,7 +252,7 @@ public class Debug {
 
     //--------------------------------------------------
     private static String getDebugLogfileName() {
-        return CommonConst.CRAID_PATH + File.separator + 
+        return mLogFilePath + File.separator + 
                         LOGGING_LOGFILENAME;
     }
 
@@ -456,14 +427,19 @@ public class Debug {
                                     String aMsg, boolean nl) {
         // Print message to stream only if subsystem is specified and verbosity
         // is set appropriately
-        if (mVerbosity >= aVerbosity &&
+    	if (mVerbosity >= aVerbosity &&
                     (mSubSystems.contains("ALL") || mSubSystems.contains(aSubSystem))) {
-            String string = aSubSystem + ": " + aMsg;
+    		String string = aSubSystem + ": " + aMsg;
             stdoutPrint(string, nl);
             logfilePrint(string, nl);
         }
     }
 
+    // Method prints out trace messages
+    //--------------------------------------------------
+    public static void trace(String aSubSystem, int aVerbosity, String aMsg, int aLineNum) {
+        trace(aSubSystem, aVerbosity, String.valueOf(aLineNum)+": "+aMsg, true);
+    }
 
     // Method prints out trace messages
     //--------------------------------------------------

@@ -7,6 +7,11 @@ import javax.crypto.SecretKey;
 
 import com.jay.util.CommonConst;
 
+/**
+ * 
+ * @author Karl
+ *
+ */
 public class MetaCraid implements Serializable {
 	private static final long serialVersionUID = -2518143671167959230L;
 	private String mId = null;

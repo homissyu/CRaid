@@ -76,8 +76,7 @@ public class FileHandler {
      * @throws JayException
      */
     public void writeFile(String sFileName, byte[] contentBuf, String sPath){
-    	System.out.println(sPath);
-        String sFilePath = sPath + sFileName;
+    	    String sFilePath = sPath + sFileName;
         try{
             if(checkPath(sPath)) writeFile(sFilePath, contentBuf);
             else throw new FileNotFoundException();

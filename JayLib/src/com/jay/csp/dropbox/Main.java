@@ -18,9 +18,8 @@ public class Main {
     private static final String ACCESS_TOKEN = "zpidx03q273uvx1";
 
     public static void main(String args[]) throws DbxException, IOException {
-//    	System.setProperty("http.proxyHost", "210.121.169.112") ;
-//        System.setProperty("http.proxyPort", "3128");
-
+//    	System.setProperty("java.net.useSystemProxies", "true");
+    	
         // Create Dropbox client
         DbxRequestConfig config = new DbxRequestConfig("dropbox/java-tutorial", "en_US");
         DbxClientV2 client = new DbxClientV2(config, ACCESS_TOKEN);

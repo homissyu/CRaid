@@ -18,7 +18,7 @@ public class Main {
     private static final String ACCESS_TOKEN = "zpidx03q273uvx1";
 
     public static void main(String args[]) throws DbxException, IOException {
-//    	System.setProperty("java.net.useSystemProxies", "true");
+    	System.setProperty("java.net.useSystemProxies", "true");
     	
         // Create Dropbox client
         DbxRequestConfig config = new DbxRequestConfig("dropbox/java-tutorial", "en_US");

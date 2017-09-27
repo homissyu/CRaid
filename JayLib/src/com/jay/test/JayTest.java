@@ -30,32 +30,47 @@ public class JayTest {
 			System.lineSeparator();
 			System.out.println("1.Split Only 	2.Split&Merge	3.Mergey Only	0.exit");
 			ret = Integer.parseInt(sc.nextLine());
-			if(ret == 1 || ret == 2) {
-				System.out.println("Choose split type !");
-				System.lineSeparator();
-				System.out.println("1.Encrypt + Raid	2.Encrypt + Not Raid	3.Not Encrypt + Raid	4.Not Encrypt + Not Raid	0.exit");
-				switch(Integer.parseInt(sc.nextLine())) {
-					case 0:
-						System.exit(0);
-					case 1:
-						mEncrypt = true;
-						mRaid = true;
-						break;
-					case 2:
-						mEncrypt = true;
-						break;
-					case 3:
-						mRaid = true;
-						break;
-					case 4:
-						break;
-					default:
-						System.lineSeparator();
-						System.out.println("Invaild Argument! Retry again");
-						System.lineSeparator();
-						start();
-						break;
-				};
+			switch(ret) {
+				case 0:
+					System.out.println("Goobye!");
+					System.exit(0);
+					break;
+				case 1: case 2:
+					System.out.println("Choose split type !");
+					System.lineSeparator();
+					System.out.println("1.Encrypt + Raid	2.Encrypt + Not Raid	3.Not Encrypt + Raid	4.Not Encrypt + Not Raid	0.exit");
+					switch(Integer.parseInt(sc.nextLine())) {
+						case 0:
+							System.out.println("Goobye!");
+							System.exit(0);
+						case 1:
+							mEncrypt = true;
+							mRaid = true;
+							break;
+						case 2:
+							mEncrypt = true;
+							break;
+						case 3:
+							mRaid = true;
+							break;
+						case 4:
+							break;
+						default:
+							System.lineSeparator();
+							System.out.println("Invaild Argument! Retry again");
+							System.lineSeparator();
+							start();
+							break;
+					};
+					break;
+				case 3:
+					break;
+				default:
+					System.lineSeparator();
+					System.out.println("Invaild Argument! Retry again");
+					System.lineSeparator();
+					start();
+					break;
 			}
 		}catch(Exception ex) {
 			System.lineSeparator();
@@ -74,7 +89,7 @@ public class JayTest {
 		File dir =  new File(File.listRoots()[0], "CRaid");
 		
 		String sSourcePath = dir.getAbsolutePath();
-		String sSourceFileName = "testA.txt";
+		String sSourceFileName = "test.log";
 		String sSourceFilePath = sSourcePath + File.separator + sSourceFileName;
 		String sTargetFilePath = sSourcePath + File.separator + CommonConst.MERGE_STR + sSourceFileName;
 		String sMetaFilePath = sSourcePath + File.separator + CommonConst.META_FILE_NAME;
@@ -86,7 +101,7 @@ public class JayTest {
 			
 			CRaid craid = new CRaid();
 			
-			ArrayList<Integer> aSplitRatio = new ArrayList<Integer>();
+		ArrayList<Integer> aSplitRatio = new ArrayList<Integer>();
 //			for(int i=0;i<CommonConst.CSP_FREE_AMOUNT.length;i++) {
 //				aSplitRatio.add(CommonConst.CSP_FREE_AMOUNT[i]);
 //			}
@@ -96,10 +111,6 @@ public class JayTest {
 			aSplitRatio.add(10);
 
 			switch(start()) {
-				case 0:
-					System.out.println("System.exit(0)");
-					System.exit(0);
-				break;
 				case 1:
 					Debug.trace(test.mSubSystem, CommonConst.OPERATION_MODE, "Start Split" ,Thread.currentThread().getStackTrace()[1].getLineNumber());
 					System.out.println("Start Split : "+CommonUtil.getCurrentTime(CommonConst.DATETIME_FORMAT));
@@ -128,10 +139,6 @@ public class JayTest {
 					System.out.println("End Merge : "+CommonUtil.getCurrentTime(CommonConst.DATETIME_FORMAT));
 					break;
 				default:
-					System.lineSeparator();
-					System.out.println("Invaild Argument! Retry again");
-					System.lineSeparator();
-					start();
 					break;
 			}
 			

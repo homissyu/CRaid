@@ -12,10 +12,12 @@ public final class Main {
     private static final String DEVELOPER_TOKEN = "";
     private static final int MAX_DEPTH = 1;
 
-    private Main() { }
+    private Main() {
+    	System.setProperty("java.net.useSystemProxies", "true");
+    }
 
     public static void main(String[] args) {
-        // Turn off logging to prevent polluting the output.
+    	// Turn off logging to prevent polluting the output.
         Logger.getLogger("com.box.sdk").setLevel(Level.OFF);
 
         BoxAPIConnection api = new BoxAPIConnection("yzcrvNmYZdNVkyFjhEtjp3FCZ8saKWN5");

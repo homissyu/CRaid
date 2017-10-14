@@ -21,12 +21,11 @@ import com.jay.util.FileHandler;
  */
 
 public class CRaid {
-	String mSubSystem = (this.getClass()).getCanonicalName();
-	FileHandler fh = null;
-	CryptoUtils cu = null;
+	private String mSubSystem = (this.getClass()).getCanonicalName();
+	private FileHandler fh = null;
+	
 	public CRaid() {
 		Debug.addSubsystems(mSubSystem);
-		cu = new CryptoUtils();
 		fh = new FileHandler();
 	}
 	

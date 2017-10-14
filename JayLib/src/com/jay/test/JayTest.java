@@ -14,6 +14,7 @@ public class JayTest {
 	private String mSubSystem = null;
 	private static boolean mEncrypt = false;
 	private static boolean mRaid = false;
+	private static Scanner sc = null;
 	
 	public JayTest() {
 		mSubSystem = (this.getClass()).getCanonicalName();
@@ -24,7 +25,7 @@ public class JayTest {
 	public static int start() throws Exception {
 		int ret = 0;
 		try{
-			Scanner sc = new Scanner(System.in);
+			sc = new Scanner(System.in);
 			System.out.println("#########################");
 			System.out.println("Choose operation !");
 			System.lineSeparator();

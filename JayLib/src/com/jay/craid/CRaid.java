@@ -36,13 +36,13 @@ public class CRaid {
 	 * @param doEncrypt
 	 * @param doRaid
 	 */
-	public void splitFile(String sSourceFilePath, ArrayList<Integer> aSplitRatio, boolean doEncrypt, boolean doRaid, String sMetaFilePath) {
+	public void splitFile(String sSourceFilePath, String sSplitPath, ArrayList<Integer> aSplitRatio, boolean doEncrypt, boolean doRaid, String sMetaFilePath) {
 		// TODO Auto-generated method stub
 		try {
-    			MetaCraid meta = splitOperation(sSourceFilePath, aSplitRatio, doEncrypt, doRaid);
+    			MetaCraid meta = splitOperation(sSourceFilePath, sSplitPath, aSplitRatio, doEncrypt, doRaid);
     			if(doRaid) {
     				RaidController rc = new RaidController();
-		    		if(rc.backup(sSourceFilePath, meta))
+		    		if(rc.backup(CommonConst.PARITY_PATH, meta))
 		    			fh.writeSerEncFile(meta, sMetaFilePath);
 		    		else throw new Exception("Failed RAID");
 	    		}else fh.writeSerEncFile(meta, sMetaFilePath);
@@ -57,7 +57,7 @@ public class CRaid {
 	 * @param sMetaFilePath
 	 * @param sTargetFilePath
 	 */
-	public void mergeFile(String sTargetFilePath, String sMetaFilePath) {
+	public void mergeFile(String sTargetFilePath, String sSplitPath, String sMetaFilePath) {
 		// TODO Auto-generated method stub
 		try {
 			MetaCraid meta = (MetaCraid)FileHandler.readSerEncFile(sMetaFilePath);
@@ -65,7 +65,7 @@ public class CRaid {
 			Debug.trace(mSubSystem, CommonConst.QA_MODE, meta.toString(), Thread.currentThread().getStackTrace()[1].getLineNumber());
     		if(meta.isRaidType()) {
     			RaidController rc = new RaidController();
-	    		if(rc.recover(sTargetFilePath, meta))
+	    		if(rc.recover(sSplitPath, meta))
 	    			mergeOperation(meta, sTargetFilePath, meta.getOperationType());
 	    		else throw new Exception("Failed Recover from RAID");
     		}else mergeOperation(meta, sTargetFilePath, meta.getOperationType());
@@ -81,7 +81,7 @@ public class CRaid {
      * @param doRaid
      * @return
      */
-    private MetaCraid splitOperation(String sSourcePath, ArrayList<Integer> sSplitRatio, boolean isEncrypt, boolean doRaid) {
+    private MetaCraid splitOperation(String sSourcePath, String sSplitPath, ArrayList<Integer> sSplitRatio, boolean isEncrypt, boolean doRaid) {
 		MetaCraid meta = null;
 		ArrayList<String> splitFileNames = null;
 		BufferedOutputStream bw = null;	
@@ -124,7 +124,7 @@ public class CRaid {
             for(int destIx=0; destIx < iSplitCnt; destIx++) {
             	bytesPerSplit = sSplitRatio.get(destIx);
             	Debug.trace(mSubSystem, CommonConst.DEVELOPING_MODE, destIx+":bytesPerSplit:"+bytesPerSplit, Thread.currentThread().getStackTrace()[1].getLineNumber());
-            	aTempFileName = sSourcePath.substring(0,sSourcePath.lastIndexOf(File.separator)+1)+CommonUtil.makeUniqueID(24);
+            	aTempFileName = sSplitPath + File.separator + CommonUtil.makeUniqueID(24);
             	File aTempFile = new File(aTempFileName);
             	if(!aTempFile.exists()) aTempFile.createNewFile();
 	 			bw = new BufferedOutputStream(new FileOutputStream(aTempFileName));

@@ -68,7 +68,7 @@ public class RaidController {
 		try {
 			meta.setParityFileName(CommonUtil.makeUniqueID(24));
 			doRaid(meta.getSplitFileNames());
-			fh.writeFile(meta.getParityFileName(), splitBufList.get(splitBufList.size()-1), sPath.substring(0,sPath.lastIndexOf(File.separator)+1));
+			fh.writeFile(meta.getParityFileName(), splitBufList.get(splitBufList.size()-1), sPath+File.separator);
 			ret = true;
 		}catch(Exception e) {
 			e.printStackTrace();
@@ -104,7 +104,7 @@ public class RaidController {
 				}
 			}	
 			tempList.remove(targetFileName);
-			tempList.add(sPath.substring(0,sPath.lastIndexOf(File.separator)+1)+File.separator+meta.getParityFileName());
+			tempList.add(CommonConst.PARITY_PATH + File.separator + meta.getParityFileName());
 			doRaid(tempList);
 			
 			fh.writeFile(targetFileName, splitBufList.get(splitBufList.size()-1));

@@ -1,7 +1,9 @@
 package com.jay.util;
 
+import java.io.File;
+
 public class CommonConst{
-	public static final String CRAID = "CRAID";
+	public static final String CRAID = "CRaid";
     public static final String CURRENT_DIR = ".";
     public static final String WHITE_SPACE = " ";
     public static final String ENTRY_STR="entry";
@@ -47,7 +49,7 @@ public class CommonConst{
 									            'S','s','T','t','U','u','V','v','W','w','X','x',
 									            'Y','y','Z','z','1','2','3','4','5','6','7','8','9','0'};
     
-    public static final String SPLIT_STRING = "SPLIT";
+    public static final String SPLIT_STRING = "split";
 	public static final int ASCII = 0;
 	public static final int BINARY = 1;
 	public static final String FILE_TYPE = "FILE_TYPE";
@@ -92,4 +94,17 @@ public class CommonConst{
 	public static final int DEBUG_MODE = 3;
 	public static final int DEVELOPING_MODE = 4;
 	public static final String EXCEPTION_FILE_NAME = "Exception.log";
+	public static final String LOGS_DIR = "logs";
+	public static final String SOURCE_DIR = "source";
+	public static final String PARITY_DIR = "parity";
+	
+	private static final File ROOT =  new File(File.listRoots()[0], CommonConst.CRAID);
+	private static final String ROOT_PATH = ROOT.getAbsolutePath();
+	
+	
+	public static final String SOURCE_PATH = ROOT_PATH + File.separator+CommonConst.SOURCE_DIR;
+	public static final String SPLIT_PATH = ROOT_PATH + File.separator + CommonConst.SPLIT_STRING;
+	public static final String META_PATH = SPLIT_PATH;
+	public static final String LOG_PATH = ROOT_PATH + File.separator + CommonConst.LOGS_DIR;
+	public static final String PARITY_PATH = SPLIT_PATH + File.separator + CommonConst.PARITY_DIR;
 }

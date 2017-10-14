@@ -27,9 +27,11 @@ public class JayTest {
 		try{
 			sc = new Scanner(System.in);
 			System.out.println("#########################");
-			System.out.println("Choose operation !");
+			System.out.println("#      Start CRaid      #");
+			System.out.println("#########################");
+			System.out.println("Choose operation!");
 			System.lineSeparator();
-			System.out.println("1.Split Only 	2.Split&Merge	3.Mergey Only	0.exit");
+			System.out.println("1.Split Only    2.Split & Merge    3.Mergey Only    0.exit");
 			ret = Integer.parseInt(sc.nextLine());
 			switch(ret) {
 				case 0:
@@ -37,9 +39,9 @@ public class JayTest {
 					System.exit(0);
 					break;
 				case 1: case 2:
-					System.out.println("Choose split type !");
+					System.out.println("Choose split type!");
 					System.lineSeparator();
-					System.out.println("1.Encrypt + Raid	2.Encrypt + Not Raid	3.Not Encrypt + Raid	4.Not Encrypt + Not Raid	0.exit");
+					System.out.println("1.Encrypt + Backup    2.Encrypt + Not Backup    3.Not Encrypt + Backup    4.Not Encrypt + Not Backup    0.exit");
 					switch(Integer.parseInt(sc.nextLine())) {
 						case 0:
 							System.out.println("Goobye!");
@@ -87,19 +89,17 @@ public class JayTest {
 		// TODO Auto-generated method stub
 		JayTest test = new JayTest();
 		
-		File dir =  new File(File.listRoots()[0], "CRaid");
-		
-		String sSourcePath = dir.getAbsolutePath();
-		String sSourceFileName = "test.log";
-		String sSourceFilePath = sSourcePath + File.separator + sSourceFileName;
-		String sTargetFilePath = sSourcePath + File.separator + CommonConst.MERGE_STR + sSourceFileName;
-		String sMetaFilePath = sSourcePath + File.separator + CommonConst.META_FILE_NAME;
-		String sLogFilePath = sSourcePath + File.separator + CommonConst.LOG_FILE_NAME;
+		String sSourceFileName = "StackifyPrefixSetup.exe";
+		String sSourceFilePath = CommonConst.SOURCE_PATH + File.separator + sSourceFileName;
+		String sSplitPath = CommonConst.SPLIT_PATH;
+		String sTargetFilePath = CommonConst.SOURCE_PATH + File.separator+CommonConst.MERGE_STR + sSourceFileName;
+		String sMetaFilePath = CommonConst.META_PATH + File.separator + CommonConst.META_FILE_NAME;		
+		String sLogFilePath = CommonConst.LOG_PATH + File.separator + CommonConst.LOG_FILE_NAME;
 		
 		try {
 			Debug.setErrLog(sLogFilePath);
-			Debug.setLogFilePath(sSourcePath);
-			
+			Debug.setLogFilePath(CommonConst.LOG_PATH);
+			int iDebugMode = CommonConst.DEBUG_MODE;
 			CRaid craid = new CRaid();
 			
 		ArrayList<Integer> aSplitRatio = new ArrayList<Integer>();
@@ -113,30 +113,30 @@ public class JayTest {
 
 			switch(start()) {
 				case 1:
-					Debug.trace(test.mSubSystem, CommonConst.OPERATION_MODE, "Start Split" ,Thread.currentThread().getStackTrace()[1].getLineNumber());
+					Debug.trace(test.mSubSystem, iDebugMode, "Start Split" ,Thread.currentThread().getStackTrace()[1].getLineNumber());
 					System.out.println("Start Split : "+CommonUtil.getCurrentTime(CommonConst.DATETIME_FORMAT));
-					craid.splitFile(sSourceFilePath, aSplitRatio, test.mEncrypt, test.mRaid, sMetaFilePath);
-					Debug.trace(test.mSubSystem, CommonConst.OPERATION_MODE, "End Split",Thread.currentThread().getStackTrace()[1].getLineNumber());
+					craid.splitFile(sSourceFilePath, sSplitPath, aSplitRatio, test.mEncrypt, test.mRaid, sMetaFilePath);
+					Debug.trace(test.mSubSystem, iDebugMode, "End Split",Thread.currentThread().getStackTrace()[1].getLineNumber());
 					System.out.println("End Split : "+CommonUtil.getCurrentTime(CommonConst.DATETIME_FORMAT)+System.lineSeparator());
 				break;
 				case 2:
-					Debug.trace(test.mSubSystem, CommonConst.OPERATION_MODE, "Start Split" ,Thread.currentThread().getStackTrace()[1].getLineNumber());
+					Debug.trace(test.mSubSystem, iDebugMode, "Start Split" ,Thread.currentThread().getStackTrace()[1].getLineNumber());
 					System.out.println("Start Split : "+CommonUtil.getCurrentTime(CommonConst.DATETIME_FORMAT));
-					craid.splitFile(sSourceFilePath, aSplitRatio, test.mEncrypt, test.mRaid, sMetaFilePath);
-					Debug.trace(test.mSubSystem, CommonConst.OPERATION_MODE, "End Split",Thread.currentThread().getStackTrace()[1].getLineNumber());
+					craid.splitFile(sSourceFilePath, sSplitPath, aSplitRatio, test.mEncrypt, test.mRaid, sMetaFilePath);
+					Debug.trace(test.mSubSystem, iDebugMode, "End Split",Thread.currentThread().getStackTrace()[1].getLineNumber());
 					System.out.println("End Split : "+CommonUtil.getCurrentTime(CommonConst.DATETIME_FORMAT)+System.lineSeparator());
 				
-					Debug.trace(test.mSubSystem, CommonConst.OPERATION_MODE, "Start Merge",Thread.currentThread().getStackTrace()[1].getLineNumber());
+					Debug.trace(test.mSubSystem, iDebugMode, "Start Merge",Thread.currentThread().getStackTrace()[1].getLineNumber());
 					System.out.println("Start Merge : "+CommonUtil.getCurrentTime(CommonConst.DATETIME_FORMAT));
-					craid.mergeFile(sTargetFilePath, sMetaFilePath);
-					Debug.trace(test.mSubSystem, CommonConst.OPERATION_MODE, "End Merge",Thread.currentThread().getStackTrace()[1].getLineNumber());
+					craid.mergeFile(sTargetFilePath, sSplitPath, sMetaFilePath);
+					Debug.trace(test.mSubSystem, iDebugMode, "End Merge",Thread.currentThread().getStackTrace()[1].getLineNumber());
 					System.out.println("End Merge : "+CommonUtil.getCurrentTime(CommonConst.DATETIME_FORMAT));
 				break;
 				case 3:
-					Debug.trace(test.mSubSystem, CommonConst.OPERATION_MODE, "Start Merge",Thread.currentThread().getStackTrace()[1].getLineNumber());
+					Debug.trace(test.mSubSystem, iDebugMode, "Start Merge",Thread.currentThread().getStackTrace()[1].getLineNumber());
 					System.out.println("Start Merge : "+CommonUtil.getCurrentTime(CommonConst.DATETIME_FORMAT));
-					craid.mergeFile(sTargetFilePath, sMetaFilePath);
-					Debug.trace(test.mSubSystem, CommonConst.OPERATION_MODE, "End Merge",Thread.currentThread().getStackTrace()[1].getLineNumber());
+					craid.mergeFile(sTargetFilePath, sSplitPath, sMetaFilePath);
+					Debug.trace(test.mSubSystem, iDebugMode, "End Merge",Thread.currentThread().getStackTrace()[1].getLineNumber());
 					System.out.println("End Merge : "+CommonUtil.getCurrentTime(CommonConst.DATETIME_FORMAT));
 					break;
 				default:

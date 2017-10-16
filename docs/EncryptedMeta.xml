@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FILE>
+	<UID id="15883934"></UID>
+	<CSPS>
+		<CSP name="GoogleDrive">
+			<SplitFile order="1">
+				<sFileName><!--Split file name : string-->2458857922512658</sFileName>
+				<Size><!--Split file size : Byte--></Size>
+				<FileID>f1729212</FileID>			
+			</SplitFile>
+			<ParityFile>
+				<pFileName><!--Parity file name : string-->1055540123546878</pFileName>
+				<FileID>BFDF5379</FileID>
+			</ParityFile>
+		</CSP>
+		<CSP name="BOX">
+			<SplitFile order="2">
+				<sFileName>5414423548202113</sFileName>
+				<Size></Size>
+				<FileID>168026296366</FileID>			
+			</SplitFile>
+			<ParityFile>
+				<pFileName>1055540123546878</pFileName>
+				<FileID>158056092206</FileID>
+			</ParityFile>
+
+		</CSP>
+	</CSPS>
+	<FileType><!--ASCII int--></FileType>
+	<OperationType><!--Encrypt : boolean-->True</OperationType>
+	<SecretKey></SecretKey>
+	<RaidType><!--Raid : boolean-->True</RaidType>
+	<RemainingBytes><!--Remaining File : Byte--></RemainingBytes>
+</FILE>

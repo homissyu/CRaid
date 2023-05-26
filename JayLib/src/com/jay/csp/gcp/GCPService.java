@@ -19,7 +19,6 @@ import com.google.appengine.tools.cloudstorage.RetryParams;
 
 public class GCPService{
 	public void uploadFile(File file) throws IOException{
-		 // read the input stream
 	    byte[] buffer = new byte[1024];
 	    List<byte[]> allBytes = new LinkedList<byte[]>();
 	    FileInputStream reader = new FileInputStream(file);

@@ -3,14 +3,14 @@
 	<CSP>
 		<ID>1</ID>
 		<Name>pCloud</Name>
-		<MainURL><![CDATA[https://www.pcloud.com/]]></MainURL>
+		<MainURL><![CDATA[https://www.aaacloud.com/]]></MainURL>
 		<UploadType></UploadType>
 		<DownloadType></DownloadType>
 		<UploadString></UploadString>
 		<UploadIP></UploadIP>
 		<Quota>10000</Quota>
 		<Usage>0</Usage>
-		<UserId><![CDATA[homissyu@naver.com]]></UserId>
-		<Password><![CDATA[0608choi]]></Password>
+		<UserId><![CDATA[aaa@aaa.com]]></UserId>
+		<Password><![CDATA[1234qwer]]></Password>
 	</CSP>
 </CSPS>

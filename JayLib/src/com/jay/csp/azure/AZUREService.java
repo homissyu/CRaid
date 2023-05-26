@@ -11,7 +11,7 @@ import com.microsoft.azure.storage.blob.CloudBlockBlob;
 public class AZUREService {
 	public static final String storageConnectionString =
 		    "DefaultEndpointsProtocol=http;" +
-		    "AccountName=homissyu;" +
+		    "AccountName=;" + //User
 		    "AccountKey=jkzsPBCmvINMZ5/Rn8CnHOBMTcOH2nlj6qIMz9FICkjYhh4iH6RhS1VLMrW0/vjYkxpAmgwQus37xZ/VfA3y9Q==";
 	
 	public void uploadFile(File file){

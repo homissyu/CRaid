@@ -9,7 +9,6 @@ public class CSP {
 	private String Id = null;
 	private String Name = null;
 	
-	//Stream or JSON
 	private int UploadType = CommonConst.JSON_TYPE;
 	private int DownloadType = CommonConst.STREAM_TYPE;
 	

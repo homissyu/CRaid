@@ -11,7 +11,7 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 
 public class AWSService {
-    private static final String BUCKET_NAME = "homissyu";
+    private static final String BUCKET_NAME = ""; //user
     private static final String ACCESS_KEY = "AKIAIY2Z7GV34G4KZISA";
     private static final String SECRET_KEY = "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";
  

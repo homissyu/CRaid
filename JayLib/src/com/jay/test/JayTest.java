@@ -10,7 +10,7 @@ import com.jay.util.CommonUtil;
 import com.jay.util.Debug;
 
 public class JayTest {
-	
+
 	private String mSubSystem = null;
 	private static boolean mEncrypt = false;
 	private static boolean mRaid = false;

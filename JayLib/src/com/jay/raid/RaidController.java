@@ -15,7 +15,7 @@ import com.jay.util.FileHandler;
 
 /**
  * 
- * @author karl
+ * @author Kwangho.Choi
  *
  */
 public class RaidController {

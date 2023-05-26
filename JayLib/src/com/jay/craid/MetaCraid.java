@@ -9,7 +9,7 @@ import com.jay.util.CommonConst;
 
 /**
  * 
- * @author Karl
+ * @author Kwangho.Choi
  *
  */
 public class MetaCraid implements Serializable {
